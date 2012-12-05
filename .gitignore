@@ -1,0 +1,10 @@
+downloader/*
+var/*
+media/*
+*~
+nbproject/*
+app/code/local/Jonathanhussey/*
+app/etc/modules/Jonathanhussey_Commercebug.xml
+skin/frontend/commercebug/*
+app/code/local/Alanstormdotcom/*
+app/etc/modules/Alanstormdotcom_*
