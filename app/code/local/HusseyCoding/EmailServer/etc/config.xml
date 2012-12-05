@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <HusseyCoding_EmailServer>
+            <version>0.1.0</version>
+        </HusseyCoding_EmailServer>
+    </modules>
+    <global>
+        <models>
+            <core>
+                <rewrite>
+                    <email_template>HusseyCoding_EmailServer_Model_Email_CoreTemplate</email_template>
+                </rewrite>
+            </core>
+        </models>
+    </global>
+</config>
