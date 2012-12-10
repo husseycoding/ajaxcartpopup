@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <HusseyCoding_Common>
+            <active>true</active>
+            <codePool>community</codePool>
+        </HusseyCoding_Common>
+    </modules>
+</config>

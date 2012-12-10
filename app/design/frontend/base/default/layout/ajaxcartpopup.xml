@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+        <reference name="content">
+            <block type="ajaxcartpopup/popup" name="ajaxcartpopup" template="ajaxcartpopup/popup.phtml" after="-" />
+            <block type="page/html" name="ajaxnotice" template="ajaxcartpopup/notice.phtml" after="ajaxcartpopup" />
+        </reference>
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>js/ajaxcartpopup.js</name>
+            </action>
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>css/ajaxcartpopup.css</name>
+            </action>
+        </reference>
+        <reference name="right">
+            <action method="unsetChild">
+                <name>cart_sidebar</name>
+            </action>
+        </reference>
+        <reference name="left">
+            <action method="unsetChild">
+                <name>cart_sidebar</name>
+            </action>
+        </reference>
+    </default>
+</layout>

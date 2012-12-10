@@ -1,0 +1,95 @@
+<?php $update = $this->getRequest()->getParam('ajaxcartpopup'); ?>
+
+<?php if (!$update): ?>
+    <script type="text/javascript">
+    //<![CDATA[
+        var thiscartpopup = new cartpopup();
+        <?php if (Mage::registry('current_category') && !Mage::registry('current_product')): ?>
+            thiscartpopup.category = true;
+        <?php elseif (Mage::registry('current_category') && Mage::registry('current_product')): ?>
+            thiscartpopup.product = true;
+            thiscartpopup.backurl = "<?php echo Mage::registry('current_category')->getUrl(); ?>";
+            thiscartpopup.backname = "<?php echo addslashes(Mage::registry('current_category')->getName()); ?>";
+            thiscartpopup.imageurl = "<?php echo $this->helper('catalog/image')->init(Mage::registry('current_product'), 'small_image')->resize(135); ?>";
+            thiscartpopup.productname = "<?php echo addslashes(Mage::registry('current_product')->getName()); ?>";
+        <?php elseif (Mage::registry('current_product')): ?>
+            thiscartpopup.product = true;
+            thiscartpopup.backurl = "<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB); ?>";
+            thiscartpopup.backname = "Home";
+            thiscartpopup.imageurl = "<?php echo $this->helper('catalog/image')->init(Mage::registry('current_product'), 'small_image')->resize(135); ?>";
+            thiscartpopup.productname = "<?php echo addslashes(Mage::registry('current_product')->getName()); ?>";
+        <?php endif; ?>
+        <?php if ($this->showPopup()): ?>
+            thiscartpopup.showpopup = true;
+        <?php elseif ($this->notEmpty()): ?>
+            thiscartpopup.notempty = true;
+        <?php endif; ?>
+        <?php if ($this->displayCartButton()): ?>
+            thiscartpopup.cartbutton = "<?php echo $this->getSkinUrl('images/ajaxcartpopup/button_cart.gif'); ?>";
+            thiscartpopup.carturl = "<?php echo Mage::helper('checkout/cart')->getCartUrl(); ?>";
+        <?php endif; ?>
+        <?php if ($this->displayCheckoutButton()): ?>
+            thiscartpopup.checkoutbutton = "<?php echo $this->getSkinUrl('images/ajaxcartpopup/button_checkout.gif'); ?>";
+            thiscartpopup.checkouturl = "<?php echo $this->getCheckoutUrl(); ?>";
+        <?php endif; ?>
+        thiscartpopup.ajaxenabled = <?php echo $this->ajaxEnabled() && !$this->getConfigureProduct() ? 'true' : 'false'; ?>;
+        thiscartpopup.slidespeed = <?php echo $this->getSlideSpeed(); ?>;
+    //]]>
+    </script>
+<?php endif; ?>
+    
+<?php if (!$update): ?>
+<div id="cartpopup">
+    <div id="cartpopup_slidecontainer">
+<?php endif; ?>
+        <div class="cartpopup_header">
+            <span><?php echo $this->__('Shopping Cart'); ?></span>
+            <a class="cartpopup_close" href="javascript:void(null)" onclick="thiscartpopup.hidePopup()">Close</a>
+            <div class="cartpopup_clear"></div>
+        </div>
+        <form id="cartpopup_form" action="<?php echo $this->getUrl('checkout/cart/updatePost') ?>" method="post">
+            <table>
+                <thead>
+                    <th colspan="2">Product</th>
+                    <th>Price</th>
+                    <th class="centertext">Quantity</th>
+                    <th class="centertext">Total</th>
+                </thead>
+                <tbody>
+                    <?php
+                        foreach ($this->getPopupItems($this->getProductLimit()) as $item):
+                            echo '<tr>';
+                            echo '<td class="cartpopup_productimage"><a href="' . $this->getProductUrl($item->getProduct()) . '"><img src="' . Mage::helper('catalog/image')->init($item->getProduct(), 'thumbnail')->resize(60) . '" alt="' . $item->getName() . '" title="' . $item->getName() . '" /></a></td>';
+                            echo '<td class="cartpopup_productname"><a href="' . $this->getProductUrl($item->getProduct()) . '">' . $item->getName() . '</a></td>';
+                            echo '<td class="lefttext">' . $this->getItemProductPrice($item) . '</td>';
+                            echo '<td>';
+                            echo '<input name="cart[' . $item->getId() . '][qty]" value="' . $item->getQty() . '" size="4" title="' . $this->__('Quantity') . '" class="input-text qty" maxlength="12" />';
+                            echo '<a class="cartpopup_remove" href="' . $this->getDeleteUrl($item->getId()) . '">Remove</a>';
+                            echo '</td>';
+                            echo '<td class="righttext">' . $this->getItemRowPrice($item) . '</td>';
+                            echo '</tr>';
+                        endforeach;
+                    ?>
+                </tbody>
+            </table>
+        </form>
+        <div class="cartpopup_footer">
+            <?php if ($extracount = $this->getExtraCount()): ?>
+                <div class="cartpopup_cartlink">
+                    <a href="<?php echo Mage::helper('checkout/cart')->getCartUrl(); ?>">View all products</a>
+                </div>
+            <?php endif; ?>
+            <div class="cartpopup_subtotal">
+                <div class="cartpopup_producttotal">
+                    <?php echo $this->__('Total'); ?>: <?php echo $this->getCartSubtotal(); ?>
+                </div>
+                <a href="<?php echo $this->getCheckoutUrl(); ?>">
+                    <img src="<?php echo $this->getSkinUrl('images/ajaxcartpopup/button_checkout.gif'); ?>" alt="Checkout" />
+                </a>
+                <div class="cartpopup_clear"></div>
+            </div>
+        </div>
+<?php if (!$update): ?>
+    </div>
+</div>
+<?php endif; ?>

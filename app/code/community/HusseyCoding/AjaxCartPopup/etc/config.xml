@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <HusseyCoding_AjaxCartPopup>
+            <version>1.0.0</version>
+        </HusseyCoding_AjaxCartPopup>
+    </modules>
+    <global>
+        <helpers>
+            <ajaxcartpopup>
+                <class>HusseyCoding_AjaxCartPopup_Helper</class>
+            </ajaxcartpopup>
+        </helpers>
+        <blocks>
+            <ajaxcartpopup>
+                <class>HusseyCoding_AjaxCartPopup_Block</class>
+            </ajaxcartpopup>
+        </blocks>
+    </global>
+    <frontend>
+        <layout>
+            <updates>
+                <ajaxcartpopup>
+                    <file>ajaxcartpopup.xml</file>
+                </ajaxcartpopup>
+            </updates>
+        </layout>
+        <routers>
+            <checkout>
+                <args>
+                    <modules>
+                        <HusseyCoding_AjaxCartPopup before="Mage_Checkout">HusseyCoding_AjaxCartPopup</HusseyCoding_AjaxCartPopup>
+                    </modules>
+                </args>
+            </checkout>
+        </routers>
+    </frontend>
+</config>

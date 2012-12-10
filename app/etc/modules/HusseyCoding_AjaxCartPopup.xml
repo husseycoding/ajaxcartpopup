@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <HusseyCoding_AjaxCartPopup>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <HusseyCoding_Common />
+            </depends>
+        </HusseyCoding_AjaxCartPopup>
+    </modules>
+</config>

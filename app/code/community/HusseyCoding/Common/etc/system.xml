@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <husseycoding translate="label">
+            <label>Hussey Coding</label>
+            <sort_order>500</sort_order>
+        </husseycoding>
+    </tabs>
+</config>
