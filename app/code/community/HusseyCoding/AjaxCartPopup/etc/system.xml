@@ -71,7 +71,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Defaults to 0.3. Higher is faster, 0 is instant.</comment>
+                            <comment>Defaults to 0.3. Higher is slower, 0 is instant.</comment>
                         </slide_speed>
                         <incl_tax>
                             <label>Prices Include Tax</label>
