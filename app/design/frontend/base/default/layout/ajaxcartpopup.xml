@@ -4,6 +4,9 @@
         <reference name="content">
             <block type="ajaxcartpopup/popup" name="ajaxcartpopup" template="ajaxcartpopup/popup.phtml" after="-" />
             <block type="page/html" name="ajaxnotice" template="ajaxcartpopup/notice.phtml" after="ajaxcartpopup" />
+            <action method="unsetChild">
+                <name>cart_sidebar</name>
+            </action>
         </reference>
         <reference name="head">
             <action method="addItem">
