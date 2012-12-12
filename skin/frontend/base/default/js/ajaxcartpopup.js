@@ -262,6 +262,10 @@ var cartpopup = Class.create({
                 this.hidePopup();
             }
         }.bindAsEventListener(this));
+    },
+    positionAll: function() {
+        this.positionNotice();
+        this.positionPopup();
     }
 });
 
@@ -273,6 +277,6 @@ document.observe("dom:loaded", function() {
 
 Event.observe(window, "resize", function() {
     if (typeof(thiscartpopup) == "object") {
-        thiscartpopup.positionNotice();
+        thiscartpopup.positionAll();
     }
 });
