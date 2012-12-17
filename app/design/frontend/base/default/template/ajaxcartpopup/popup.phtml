@@ -34,6 +34,8 @@
         <?php endif; ?>
         thiscartpopup.ajaxenabled = <?php echo $this->ajaxEnabled() && !$this->getConfigureProduct() ? 'true' : 'false'; ?>;
         thiscartpopup.slidespeed = <?php echo $this->getSlideSpeed(); ?>;
+        thiscartpopup.deleteurls = [];
+        thiscartpopup.updateurl = "<?php echo $this->getUrl('checkout/cart/updatePost'); ?>";
     //]]>
     </script>
 <?php endif; ?>
@@ -47,7 +49,7 @@
             <a class="cartpopup_close" href="javascript:void(null)" onclick="thiscartpopup.hidePopup()">Close</a>
             <div class="cartpopup_clear"></div>
         </div>
-        <form id="cartpopup_form" action="<?php echo $this->getUrl('checkout/cart/updatePost') ?>" method="post">
+        <form id="cartpopup_form" action="javascript:thiscartpopup.updateQuantityAction()" method="post">
             <table>
                 <thead>
                     <th class="lefttext" colspan="2">Product</th>
@@ -55,16 +57,25 @@
                     <th class="centertext">Quantity</th>
                     <th class="centertext">Total</th>
                 </thead>
-                <tbody>
+                <tbody>                    
                     <?php
                         foreach ($this->getPopupItems($this->getProductLimit()) as $item):
+                            echo '<script type="text/javascript">';
+                            echo 'thiscartpopup.deleteurls[' . $item->getId() . '] = "' . $this->getDeleteUrl($item->getId()) . '";';
+                            echo '</script>';
                             echo '<tr>';
                             echo '<td class="cartpopup_productimage"><a href="' . $this->getProductUrl($item->getProduct()) . '"><img src="' . Mage::helper('catalog/image')->init($item->getProduct(), 'thumbnail')->resize(60) . '" alt="' . $item->getName() . '" title="' . $item->getName() . '" /></a></td>';
-                            echo '<td class="cartpopup_productname"><a href="' . $this->getProductUrl($item->getProduct()) . '">' . $item->getName() . '</a></td>';
+                            echo '<td class="cartpopup_productname"><a href="' . $this->getProductUrl($item->getProduct()) . '">' . $item->getName() . '</a>';
+                            if ($messages = $this->getItemMessages($item)):
+                                foreach ($messages as $message):
+                                    echo '<p class="item-msg ' . $message['type'] . '">' . $this->escapeHtml($message['text']) . '</p>';
+                                endforeach;
+                            endif;
+                            echo '</td>';
                             echo '<td class="lefttext">' . $this->getItemProductPrice($item) . '</td>';
                             echo '<td>';
                             echo '<input name="cart[' . $item->getId() . '][qty]" value="' . $item->getQty() . '" size="4" title="' . $this->__('Quantity') . '" class="input-text qty" maxlength="12" />';
-                            echo '<a class="cartpopup_remove" href="' . $this->getDeleteUrl($item->getId()) . '">Remove</a>';
+                            echo '<a class="cartpopup_remove" href="javascript:void(null)" onclick="thiscartpopup.removeFromCart(' . $item->getId() . ')">Remove</a>';
                             echo '</td>';
                             echo '<td class="righttext">' . $this->getItemRowPrice($item) . '</td>';
                             echo '</tr>';
@@ -87,6 +98,11 @@
                     <img src="<?php echo $this->getSkinUrl('images/ajaxcartpopup/button_checkout.gif'); ?>" alt="Checkout" />
                 </a>
                 <div class="cartpopup_clear"></div>
+            </div>
+        </div>
+        <div id="cartpopup_overlay">
+            <div class="cartpopup_overlay_center">
+                <img src="<?php echo $this->getSkinUrl('images/ajaxcartpopup/loading.gif'); ?>" alt="" />
             </div>
         </div>
 <?php if (!$update): ?>

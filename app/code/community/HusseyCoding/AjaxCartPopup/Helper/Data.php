@@ -248,4 +248,10 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
         
         return strpos($request, $compare) === 0 ? true : false;
     }
+    
+    public function getCartItemCount()
+    {
+        $allitems = Mage::getSingleton('checkout/cart')->getItems();
+        return count($allitems);
+    }
 }

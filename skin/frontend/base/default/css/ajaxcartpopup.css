@@ -1,5 +1,5 @@
 #cartpopup { position:absolute; top:-10000px; z-index:99998; }
-#cartpopup img { display:block; border:1px solid #ccc; }
+#cartpopup .cartpopup_productimage img { display:block; border:1px solid #ccc; }
 #cartpopup * { border-width:0; margin:0; padding:0; }
 #cartpopup_slidecontainer { width:396px; border:1px solid #aaa; padding:10px; background-color:#fff; }
 #cartpopup_slidecontainer .cartpopup_close { float:right; }
@@ -11,6 +11,8 @@
 #cartpopup_slidecontainer tbody input { margin:0 !important; border:1px solid #ccc; font-size:13px; height:15px; line-height:17px; text-align:center; }
 #cartpopup_slidecontainer tbody a { display:block; font-size:13px; }
 #cartpopup_slidecontainer tbody .cartpopup_productname a { font-size:11px; text-align:left; }
+#cartpopup_slidecontainer tbody .cartpopup_productname .error,
+#cartpopup_slidecontainer tbody .cartpopup_productname .notice { font-size:10px; text-align:left; }
 #cartpopup_slidecontainer .cartpopup_cartlink { font-size:14px; line-height:17px; position:absolute; left:7px; bottom:2px; }
 #cartpopup_slidecontainer td { padding:7px; border-bottom:1px dotted #ccc; text-align:center; }
 #cartpopup_slidecontainer .righttext { text-align:right !important; }
@@ -26,6 +28,9 @@
 #cartpopup_slidecontainer .cartpopup_footer .cartpopup_subtotal a { float:right; clear:right; margin:7px 7px 0 0; }
 #cartpopup_slidecontainer table { width:396px; }
 #cartpopup_slidecontainer thead th { height:22px; padding:2px 7px 0; font-size:13px; color:#fff; background-color:#2f2f2f; vertical-align:middle; }
+#cartpopup_slidecontainer #cartpopup_overlay { height:100%; width:100%; position:absolute; left:0; top:0; background:url(../images/ajaxcartpopup/overlay.png) center; }
+#cartpopup_slidecontainer .cartpopup_overlay_center { height:50%; width:100%; position:relative; }
+#cartpopup_slidecontainer .cartpopup_overlay_center img { position:absolute; bottom:-12px; left:197px; }
 
 #ajaxnotice { position:fixed; padding:10px; border:1px solid #aaa; z-index:99999; background-color:#fff; font-size:13px; }
 #ajaxnotice img { display:block; }

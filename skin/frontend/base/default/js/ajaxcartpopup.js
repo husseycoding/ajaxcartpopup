@@ -20,19 +20,36 @@ var cartpopup = Class.create({
         }
     },
     initPopup: function() {
+        $("cartpopup_overlay").hide();
         this.mouseclose = true;
         this.positionPopupStart();
         this.mouseDisplayPopup();
         this.addInputListener.bind(this).delay(this.slidespeed);
+        this.popupshowing = false;
+    },
+    disablePopup: function() {
+        this.notempty = false;
+        this.mouseclose = false;
+        document.stopObserving("click");
+        $("cartpopup").stopObserving("mouseout");
+        this.cartelement.stopObserving("mouseover");
+        if (this.popupshowing) {
+            Effect.SlideUp("cartpopup", {duration: this.slidespeed});
+            this.popupshowing = false;
+        }
     },
     observeSubmit: function() {
-        this.submitUrl = $("product_addtocart_form").readAttribute("action");
+        this.submiturl = $("product_addtocart_form").readAttribute("action");
         $("product_addtocart_form").writeAttribute("action", "javascript:thiscartpopup.submitAction()");
     },
     submitAction: function() {
         var formdata = $("product_addtocart_form").serialize(true);
         var id = false;
-        this.addToCart(id, formdata, this.submitUrl)
+        this.addToCart(id, formdata, this.submiturl)
+    },
+    updateQuantityAction: function() {
+        var formdata = $("cartpopup_form").serialize(true);
+        this.updateQuantity(formdata, this.updateurl);
     },
     collectCategoryRequests: function() {
         this.requests = {};
@@ -68,9 +85,9 @@ var cartpopup = Class.create({
         this.positionNotice();
         $("ajaxnotice").show();
         if (formdata) {
-            var parameters = formdata;
             formdata.ajaxcartpopup = true;
             formdata.isproductpage = true;
+            var parameters = formdata;
         } else {
             var parameters = {ajaxcartpopup : true, imagedetail : true};
         }
@@ -88,6 +105,8 @@ var cartpopup = Class.create({
                     var message = contentarray.message;
                     var linktext = contentarray.linktext;
                     var popuphtml = contentarray.popuphtml;
+                    var itemid = contentarray.itemid;
+                    var deleteurl = contentarray.deleteurl;
                     if (contentarray.imageurl) {
                         this.imageurl = contentarray.imageurl;
                     }
@@ -138,13 +157,9 @@ var cartpopup = Class.create({
                     $("ajaxnotice").show();
                     
                     if (result == "success") {
-                        if (linktext) {
-                            var link = $$("a.top-link-cart")[0];
-                            link.writeAttribute("title", linktext);
-                            link.innerHTML = linktext;
-                        }
-                        if (popuphtml) {
-                            $("cartpopup_slidecontainer").innerHTML = popuphtml;
+                        this.updatePopup(linktext, popuphtml);
+                        if (itemid && deleteurl) {
+                            this.deleteurls[itemid] = deleteurl;
                         }
                         if (!this.notempty) {
                             this.notempty = true;
@@ -161,6 +176,75 @@ var cartpopup = Class.create({
                 }
             }.bind(this)
         });
+    },
+    removeFromCart: function(id) {
+        $("cartpopup_overlay").show();
+        var url = this.deleteurls[id];
+        var parameters = {ajaxcartpopup : true};
+        new Ajax.Request(url, {
+            parameters: parameters,
+            onSuccess: function(response) {
+                var contentarray = response.responseText.evalJSON();
+                var result = contentarray.result;
+                if (result == "success") {
+                    var emptycart = contentarray.emptycart;
+                    var linktext = contentarray.linktext;
+                    var popuphtml = contentarray.popuphtml;
+                    if (emptycart) {
+                        this.disablePopup();
+                        this.updatePopup.bind(this).delay(this.slidespeed, linktext, popuphtml);
+                    } else {
+                        this.updatePopup(linktext, popuphtml);
+                    }
+                } else {
+                    setLocation(result);
+                }
+            }.bind(this)
+        });
+    },
+    updateQuantity: function(formdata, updateurl) {
+        $("cartpopup_overlay").show();
+        if (formdata) {
+            formdata.ajaxcartpopup = true;
+            formdata.ajaxupdatequantity = true;
+            formdata.update_cart_action = "update_qty";
+            var parameters = formdata;
+        }
+        if (updateurl) {
+            var url = updateurl;
+        }
+        new Ajax.Request(url, {
+            parameters: parameters,
+            onSuccess: function(response) {
+                var contentarray = response.responseText.evalJSON();
+                var result = contentarray.result;
+                if (result == "success") {
+                    var emptycart = contentarray.emptycart;
+                    var linktext = contentarray.linktext;
+                    var popuphtml = contentarray.popuphtml;
+                    if (emptycart) {
+                        this.disablePopup();
+                        this.updatePopup.bind(this).delay(this.slidespeed, linktext, popuphtml);
+                    } else {
+                        this.updatePopup(linktext, popuphtml);
+                    }
+                } else {
+                    setLocation(result);
+                }
+            }.bind(this)
+        });
+    },
+    updatePopup: function(linktext, popuphtml) {
+        if (linktext) {
+            var link = $$("a.top-link-cart")[0];
+            link.writeAttribute("title", linktext);
+            link.innerHTML = linktext;
+        }
+        if (popuphtml) {
+            $("cartpopup_slidecontainer").innerHTML = popuphtml;
+        }
+        $("cartpopup_overlay").hide();
+        this.addInputListener();
     },
     getProductImage: function() {
         if (this.imageurl && this.productname) {
@@ -180,6 +264,7 @@ var cartpopup = Class.create({
             this.mouseHidePopup.bind(this).delay(this.slidespeed);
             this.addCloseListener.bind(this).delay(this.slidespeed);
         }
+        this.popupshowing = true;
     },
     positionPopupStart: function() {
         $("cartpopup").hide();
@@ -202,7 +287,8 @@ var cartpopup = Class.create({
             var diff = (posleft + $("cartpopup").getWidth()) - mainright;
             posleft = posleft - diff;
         }
-        var postop = top + height;
+        var scroll = document.viewport.getScrollOffsets();
+        var postop = top + height + scroll.top;
         $("cartpopup").setStyle({
             top: postop + "px",
             left: posleft + "px"
@@ -247,6 +333,7 @@ var cartpopup = Class.create({
             Effect.SlideUp("cartpopup", {duration: this.slidespeed});
             this.mouseDisplayPopup.bind(this).delay(this.slidespeed);
         }
+        this.popupshowing = false;
     },
     hideNotice: function() {
         $("ajaxnotice").hide();

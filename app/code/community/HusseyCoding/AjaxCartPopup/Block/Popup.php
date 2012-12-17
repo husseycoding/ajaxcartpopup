@@ -100,6 +100,21 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
         else:
             return Mage::helper('checkout')->formatPrice($this->getSubtotal(true));
         endif;
+    }
+    
+    public function getItemMessages($item)
+    {
+        $item->checkData();
+        $baseMessages = $item->getMessage(false);
+        if ($baseMessages) {
+            foreach ($baseMessages as $message) {
+                $messages[] = array(
+                    'text' => $message,
+                    'type' => $item->getHasError() ? 'error' : 'notice'
+                );
+            }
+        }
         
+        return $messages;
     }
 }
