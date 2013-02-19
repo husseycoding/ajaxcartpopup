@@ -255,6 +255,7 @@ var cartpopup = Class.create({
         }
     },
     displayPopup: function() {
+        $("cartpopup_overlay").hide();
         if (!this.mouseclose) {
             this.positionPopupStart();
             Effect.SlideDown("cartpopup", {duration: this.slidespeed});
@@ -358,7 +359,14 @@ var cartpopup = Class.create({
 
 document.observe("dom:loaded", function() {
     if (typeof(thiscartpopup) == "object") {
-        thiscartpopup.afterInit();
+        if (typeof(thisevolvedupdate) == "object") {
+            $("ajaxnotice").hide();
+            document.observe("evolved:loaded", function() {
+                thiscartpopup.afterInit();
+            });
+        } else {
+            thiscartpopup.afterInit();
+        }
     }
 });
 
