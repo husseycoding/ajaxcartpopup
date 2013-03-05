@@ -54,28 +54,30 @@ var cartpopup = Class.create({
     collectCategoryRequests: function() {
         this.requests = {};
         $$("button.btn-cart").each(function(e) {
-            var request = e.readAttribute("onclick");
-            if (request.indexOf("/product/") > 0) {
-                var id = request.substring(request.indexOf("/product/")).split("/");
-                id = id[2];
-                e.addClassName("ajaxprodid-" + id);
-                request = request.replace(/^setlocation\(['"]{1}/i, "").replace(/['"]{1}\)$/, "");
-                this.requests[id] = request;
-                e.writeAttribute("onclick", "");
-                
-                e.observe("click", function(ev) {
-                    var target = ev.target;
-                    if (target.tagName.toLowerCase() != "button") {
-                        target = target.up("button.btn-cart");
-                    }
-                    var id = target.className;
-                    if (id.indexOf("ajaxprodid-")) {
-                        id = id.substring(id.indexOf("ajaxprodid-"));
-                        id = id.split(" ").shift();
-                        id = id.split("-").pop();
-                        this.addToCart(id);
-                    }
-                }.bindAsEventListener(this, e));
+            if (!e.up("div.block-reorder")) {
+                var request = e.readAttribute("onclick");
+                if (request.indexOf("/product/") > 0) {
+                    var id = request.substring(request.indexOf("/product/")).split("/");
+                    id = id[2];
+                    e.addClassName("ajaxprodid-" + id);
+                    request = request.replace(/^setlocation\(['"]{1}/i, "").replace(/['"]{1}\)$/, "");
+                    this.requests[id] = request;
+                    e.writeAttribute("onclick", "");
+
+                    e.observe("click", function(ev) {
+                        var target = ev.target;
+                        if (target.tagName.toLowerCase() != "button") {
+                            target = target.up("button.btn-cart");
+                        }
+                        var id = target.className;
+                        if (id.indexOf("ajaxprodid-")) {
+                            id = id.substring(id.indexOf("ajaxprodid-"));
+                            id = id.split(" ").shift();
+                            id = id.split("-").pop();
+                            this.addToCart(id);
+                        }
+                    }.bindAsEventListener(this, e));
+                }
             }
         }.bind(this));
     },

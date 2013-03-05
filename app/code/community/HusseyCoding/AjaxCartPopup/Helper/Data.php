@@ -21,14 +21,24 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
             if ($cartcount = $this->getCartCount()):
                 if ($cartcount != $this->getCustomerSession()->getCartCount()):
                     $this->updateCartCount();
-                    $request = Mage::helper('core/url')->getCurrentUrl();
+                    $request = Mage::app()->getRequest();
+                    if ($request->isXmlHttpRequest() && class_exists('evolved') && $request->getServer('HTTP_REFERER')):
+                        $request = $request->getServer('HTTP_REFERER');
+                    else:
+                        $request = Mage::helper('core/url')->getCurrentUrl();
+                    endif;
                     $carturl = Mage::helper('checkout/cart')->getCartUrl();
                     $checkouturl = $this->getCheckoutUrl();
                     if ($request != $carturl && $request != $checkouturl):
                         $this->_showpopup = true;
                     endif;
                 else:
-                    $request = Mage::helper('core/url')->getCurrentUrl();
+                    $request = Mage::app()->getRequest();
+                    if ($request->isXmlHttpRequest() && class_exists('evolved') && $request->getServer('HTTP_REFERER')):
+                        $request = $request->getServer('HTTP_REFERER');
+                    else:
+                        $request = Mage::helper('core/url')->getCurrentUrl();
+                    endif;
                     $carturl = Mage::helper('checkout/cart')->getCartUrl();
                     $checkouturl = $this->getCheckoutUrl();
                     if ($request != $carturl && $request != $checkouturl):
@@ -243,7 +253,12 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
     
     public function getConfigureProduct()
     {
-        $request = Mage::helper('core/url')->getCurrentUrl();
+        $request = Mage::app()->getRequest();
+        if ($request->isXmlHttpRequest() && class_exists('evolved') && $request->getServer('HTTP_REFERER')):
+            $request = $request->getServer('HTTP_REFERER');
+        else:
+            $request = Mage::helper('core/url')->getCurrentUrl();
+        endif;
         $compare = Mage::helper('checkout/cart')->getCartUrl() . 'configure/';
         
         return strpos($request, $compare) === 0 ? true : false;
