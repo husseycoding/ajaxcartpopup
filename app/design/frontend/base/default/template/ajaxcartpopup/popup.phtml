@@ -1,9 +1,12 @@
 <?php $update = $this->getRequest()->getParam('ajaxcartpopup'); ?>
+<?php $evolved = $this->getRequest()->getParam('evolvedupdate'); ?>
 
 <?php if (!$update): ?>
     <script type="text/javascript">
     //<![CDATA[
-        var thiscartpopup = new cartpopup();
+        <?php if (!$evolved): ?>
+            var thiscartpopup = new cartpopup();
+        <?php endif; ?>
         <?php if (Mage::registry('current_category') && !Mage::registry('current_product')): ?>
             thiscartpopup.category = true;
         <?php elseif (Mage::registry('current_category') && Mage::registry('current_product')): ?>
@@ -19,6 +22,8 @@
             thiscartpopup.imageurl = "<?php echo $this->helper('catalog/image')->init(Mage::registry('current_product'), 'small_image')->resize(135); ?>";
             thiscartpopup.productname = "<?php echo addslashes(Mage::registry('current_product')->getName()); ?>";
         <?php endif; ?>
+        thiscartpopup.showpopup = false;
+        thiscartpopup.notempty = false;
         <?php if ($this->showPopup()): ?>
             thiscartpopup.showpopup = true;
         <?php elseif ($this->notEmpty()): ?>
