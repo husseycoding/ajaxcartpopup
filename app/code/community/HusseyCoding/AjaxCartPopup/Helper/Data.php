@@ -22,7 +22,7 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
                 if ($cartcount != $this->getCustomerSession()->getCartCount()):
                     $this->updateCartCount();
                     $request = Mage::app()->getRequest();
-                    if ($request->isXmlHttpRequest() && class_exists('evolved') && $request->getServer('HTTP_REFERER')):
+                    if ($request->isXmlHttpRequest() && @class_exists('evolved') && $request->getServer('HTTP_REFERER')):
                         $request = $request->getServer('HTTP_REFERER');
                     else:
                         $request = Mage::helper('core/url')->getCurrentUrl();
@@ -34,7 +34,7 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
                     endif;
                 else:
                     $request = Mage::app()->getRequest();
-                    if ($request->isXmlHttpRequest() && class_exists('evolved') && $request->getServer('HTTP_REFERER')):
+                    if ($request->isXmlHttpRequest() && @class_exists('evolved') && $request->getServer('HTTP_REFERER')):
                         $request = $request->getServer('HTTP_REFERER');
                     else:
                         $request = Mage::helper('core/url')->getCurrentUrl();
@@ -254,7 +254,7 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
     public function getConfigureProduct()
     {
         $request = Mage::app()->getRequest();
-        if ($request->isXmlHttpRequest() && class_exists('evolved') && $request->getServer('HTTP_REFERER')):
+        if ($request->isXmlHttpRequest() && @class_exists('evolved') && $request->getServer('HTTP_REFERER')):
             $request = $request->getServer('HTTP_REFERER');
         else:
             $request = Mage::helper('core/url')->getCurrentUrl();

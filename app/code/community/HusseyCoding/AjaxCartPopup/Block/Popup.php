@@ -115,6 +115,6 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
             }
         }
         
-        return $messages;
+        return isset($messages) ? $message : false;
     }
 }

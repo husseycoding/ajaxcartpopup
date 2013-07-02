@@ -1,6 +1,7 @@
 var cartpopup = Class.create({
     afterInit: function() {
         $$('body')[0].insert($("cartpopup"));
+        $("cartpopup").hide();
         this.cartelement = $$("a.top-link-cart")[0];
         if (this.ajaxenabled) {
             if (this.category) {
