@@ -207,5 +207,3 @@
 ## http://developer.yahoo.com/performance/rules.html#etags
 
     #FileETag none
-
-SetEnv MAGE_IS_DEVELOPER_MODE "true"
