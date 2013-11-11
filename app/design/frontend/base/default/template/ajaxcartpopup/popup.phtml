@@ -41,6 +41,7 @@
         thiscartpopup.slidespeed = <?php echo $this->getSlideSpeed(); ?>;
         thiscartpopup.deleteurls = [];
         thiscartpopup.updateurl = "<?php echo $this->getUrl('checkout/cart/updatePost'); ?>";
+        thiscartpopup.showonadd = <?php echo $this->showPopupOnAdd() ? 'true' : 'false'; ?>;
     //]]>
     </script>
 <?php endif; ?>
@@ -57,10 +58,10 @@
         <form id="cartpopup_form" action="javascript:thiscartpopup.updateQuantityAction()" method="post">
             <table>
                 <thead>
-                    <th class="lefttext" colspan="2">Product</th>
-                    <th class="lefttext">Price</th>
-                    <th class="centertext">Quantity</th>
-                    <th class="centertext">Total</th>
+                    <th class="lefttext" colspan="2"><?php echo $this->__('Product'); ?></th>
+                    <th class="lefttext"><?php echo $this->__('Price'); ?></th>
+                    <th class="centertext"><?php echo $this->__('Quantity'); ?></th>
+                    <th class="centertext"><?php echo $this->__('Total'); ?></th>
                 </thead>
                 <tbody>                    
                     <?php
@@ -92,7 +93,7 @@
         <div class="cartpopup_footer">
             <?php if ($extracount = $this->getExtraCount()): ?>
                 <div class="cartpopup_cartlink">
-                    <a href="<?php echo Mage::helper('checkout/cart')->getCartUrl(); ?>">View all products</a>
+                    <a href="<?php echo Mage::helper('checkout/cart')->getCartUrl(); ?>"><?php echo $this->__('View all products'); ?></a>
                 </div>
             <?php endif; ?>
             <div class="cartpopup_subtotal">

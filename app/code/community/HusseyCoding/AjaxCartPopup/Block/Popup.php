@@ -117,4 +117,9 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
         
         return isset($messages) ? $message : false;
     }
+    
+    public function showPopupOnAdd()
+    {
+        return Mage::helper('ajaxcartpopup')->showPopupOnAdd();
+    }
 }

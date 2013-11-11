@@ -269,4 +269,9 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
         $allitems = Mage::getSingleton('checkout/cart')->getItems();
         return count($allitems);
     }
+    
+    public function showPopupOnAdd()
+    {
+        return Mage::getStoreConfig('ajaxcartpopup/popup/show_on_add') ? true : false;
+    }
 }

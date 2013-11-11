@@ -117,47 +117,52 @@ var cartpopup = Class.create({
                         this.productname = contentarray.productname;
                     }
                     var image = this.getProductImage();
-                    var notice = "";
-                    if (image) {
-                        notice += "<div class=\"ajaxnotice_image\">" + image + "</div>";
-                    }
-                    notice += "<div class=\"ajaxnotice_content\">";
-                    if (this.backurl && this.backname) {
-                        notice += "<a class=\"ajaxnotice_back\" href=\"" + this.backurl + "\">< Back to " + this.backname + "</a>";
-                    }
-                    notice += "<a class=\"ajaxnotice_close\" href=\"javascript:void(null)\" onclick=\"thiscartpopup.hideNotice()\">CLOSE</a>";
-                    notice += "<div class=\"ajaxnotice_clearer\"></div>";
-                    if (!result && this.product) {
-                        var errorclass = " ajaxaddfailed";
+                    if (this.showonadd) {
+                        $("ajaxnotice").hide();
+                        this.displayPopup();
                     } else {
-                        var errorclass = "";
-                    }
-                    if (this.cartbutton || this.checkoutbutton) {
-                        notice += "<div class=\"ajaxnotice_message" + errorclass + "\" style=\"margin-bottom:35px\">" + message + "</div>";
-                        notice += "<div class=\"ajaxnotice_buttons\">";
-                        if (this.cartbutton) {
-                            notice += "<a href=\"" + this.carturl + "\">";
-                            notice += "<div class=\"ajaxnotice_cart\"><img src=\"" + this.cartbutton + "\" alt=\"\" \\></div>";
-                            notice += "</a>";
+                        var notice = "";
+                        if (image) {
+                            notice += "<div class=\"ajaxnotice_image\">" + image + "</div>";
                         }
-                        if (this.checkoutbutton) {
-                            notice += "<a href=\"" + this.checkouturl + "\">";
-                            notice += "<div class=\"ajaxnotice_checkout\"><img src=\"" + this.checkoutbutton + "\" alt=\"\" \\></div>";
-                            notice += "</a>";
+                        notice += "<div class=\"ajaxnotice_content\">";
+                        if (this.backurl && this.backname) {
+                            notice += "<a class=\"ajaxnotice_back\" href=\"" + this.backurl + "\">< Back to " + this.backname + "</a>";
+                        }
+                        notice += "<a class=\"ajaxnotice_close\" href=\"javascript:void(null)\" onclick=\"thiscartpopup.hideNotice()\">CLOSE</a>";
+                        notice += "<div class=\"ajaxnotice_clearer\"></div>";
+                        if (!result && this.product) {
+                            var errorclass = " ajaxaddfailed";
+                        } else {
+                            var errorclass = "";
+                        }
+                        if (this.cartbutton || this.checkoutbutton) {
+                            notice += "<div class=\"ajaxnotice_message" + errorclass + "\" style=\"margin-bottom:35px\">" + message + "</div>";
+                            notice += "<div class=\"ajaxnotice_buttons\">";
+                            if (this.cartbutton) {
+                                notice += "<a href=\"" + this.carturl + "\">";
+                                notice += "<div class=\"ajaxnotice_cart\"><img src=\"" + this.cartbutton + "\" alt=\"\" \\></div>";
+                                notice += "</a>";
+                            }
+                            if (this.checkoutbutton) {
+                                notice += "<a href=\"" + this.checkouturl + "\">";
+                                notice += "<div class=\"ajaxnotice_checkout\"><img src=\"" + this.checkoutbutton + "\" alt=\"\" \\></div>";
+                                notice += "</a>";
+                            }
+                            notice += "<div class=\"ajaxnotice_clearer\"></div>";
+                            notice += "</div>";
+                        } else {
+                            notice += "<div class=\"ajaxnotice_message" + errorclass + "\">" + message + "</div>";
                         }
                         notice += "<div class=\"ajaxnotice_clearer\"></div>";
                         notice += "</div>";
-                    } else {
-                        notice += "<div class=\"ajaxnotice_message" + errorclass + "\">" + message + "</div>";
+                        $("ajaxnotice").hide();
+                        $("ajaxnotice_working").hide();
+                        $("ajaxnotice_result").update(notice);
+                        $("ajaxnotice_result").show();
+                        this.positionNotice();
+                        $("ajaxnotice").show();
                     }
-                    notice += "<div class=\"ajaxnotice_clearer\"></div>";
-                    notice += "</div>";
-                    $("ajaxnotice").hide();
-                    $("ajaxnotice_working").hide();
-                    $("ajaxnotice_result").update(notice);
-                    $("ajaxnotice_result").show();
-                    this.positionNotice();
-                    $("ajaxnotice").show();
                     
                     if (result == "success") {
                         this.updatePopup(linktext, popuphtml);
