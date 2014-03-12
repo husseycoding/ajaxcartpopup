@@ -43,6 +43,8 @@
         thiscartpopup.deleteurls = [];
         thiscartpopup.updateurl = "<?php echo $this->getUrl('checkout/cart/updatePost'); ?>";
         thiscartpopup.showonadd = <?php echo $this->showPopupOnAdd() ? 'true' : 'false'; ?>;
+        thiscartpopup.popuptimer = <?php echo $this->popupTimerEnabled() ? 'true' : 'false'; ?>;
+        thiscartpopup.popuptimerseconds = <?php echo $this->getTimerSpeed(); ?>;
     //]]>
     </script>
 <?php endif; ?>

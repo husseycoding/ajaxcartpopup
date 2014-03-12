@@ -263,6 +263,9 @@ var cartpopup = Class.create({
         }
     },
     displayPopup: function() {
+        if (this.popuptimer) {
+        setTimeout(this.hidePopup.bind(this), this.popuptimerseconds);
+        }
         $("cartpopup_overlay").hide();
         if (!this.mouseclose) {
             this.positionPopupStart();

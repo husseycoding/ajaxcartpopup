@@ -65,7 +65,12 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
     {
         return Mage::helper('ajaxcartpopup')->getSlideSpeed();
     }
-    
+
+    public function getTimerSpeed()
+    {
+        return Mage::helper('ajaxcartpopup')->getTimerSpeed();
+    }
+
     public function getConfigureProduct()
     {
         return Mage::helper('ajaxcartpopup')->getConfigureProduct();
@@ -121,5 +126,10 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
     public function showPopupOnAdd()
     {
         return Mage::helper('ajaxcartpopup')->showPopupOnAdd();
+    }
+
+    public function popupTimerEnabled()
+    {
+        return Mage::helper('ajaxcartpopup')->popupTimerEnabled();
     }
 }
