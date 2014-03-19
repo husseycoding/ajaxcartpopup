@@ -280,4 +280,9 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::getStoreConfig('ajaxcartpopup/popup/show_on_add') ? true : false;
     }
+
+    public function showDescription()
+    {
+        return Mage::getStoreConfig('ajaxcartpopup/popup/short_description') ? true : false;
+    }
 }

@@ -11,6 +11,7 @@
 #cartpopup_slidecontainer tbody input { margin:0 !important; border:1px solid #ccc; font-size:13px; height:15px; line-height:17px; text-align:center; }
 #cartpopup_slidecontainer tbody a { display:block; font-size:13px; }
 #cartpopup_slidecontainer tbody .cartpopup_productname a { font-size:11px; text-align:left; }
+#cartpopup_slidecontainer tbody .cartpopup_productname p { font-size:11px; text-align:left; }
 #cartpopup_slidecontainer tbody .cartpopup_productname .error,
 #cartpopup_slidecontainer tbody .cartpopup_productname .notice { font-size:10px; text-align:left; }
 #cartpopup_slidecontainer .cartpopup_cartlink { font-size:14px; line-height:17px; position:absolute; left:7px; bottom:2px; }

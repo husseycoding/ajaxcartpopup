@@ -117,6 +117,18 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
         
         return isset($messages) ? $message : false;
     }
+
+    public function getItemShortDescription($item)
+    {
+        $description = Mage::getModel('catalog/product')->load($item->getProductId());
+        $test = $description->getShortDescription();
+        return $test;
+    }
+
+    public function showDescription()
+    {
+        return Mage::helper('ajaxcartpopup')->showDescription();
+    }
     
     public function showPopupOnAdd()
     {
