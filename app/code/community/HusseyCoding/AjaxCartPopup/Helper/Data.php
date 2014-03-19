@@ -253,8 +253,8 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getTimerSpeed()
     {
-        $timer = (int) Mage::getStoreConfig('ajaxcartpopup/popup/popup_timer_seconds');
-        return !$timer ? 15000 : $timer * 1000;
+        $timer = (float) Mage::getStoreConfig('ajaxcartpopup/popup/popup_timer');
+        return (is_float($timer) && $timer != 0) ? $timer : false;
     }
     
     public function getConfigureProduct()
@@ -279,10 +279,5 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
     public function showPopupOnAdd()
     {
         return Mage::getStoreConfig('ajaxcartpopup/popup/show_on_add') ? true : false;
-    }
-
-    public function popupTimerEnabled()
-    {
-        return Mage::getStoreConfig('ajaxcartpopup/popup/popup_timer') ? true : false;
     }
 }

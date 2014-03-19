@@ -25,6 +25,7 @@ var cartpopup = Class.create({
         this.mouseclose = true;
         this.positionPopupStart();
         this.mouseDisplayPopup();
+        this.popupTimerEvent();
         this.addInputListener.bind(this).delay(this.slidespeed);
         this.popupshowing = false;
     },
@@ -262,10 +263,22 @@ var cartpopup = Class.create({
             return false;
         }
     },
+    popupTimerEvent: function() {
+        $("cartpopup").observe("mouseover", function(e) {
+            if (Position.within($("cartpopup"), Event.pointerX(e), Event.pointerY(e))) {
+                this.popupTimerCancel();
+            }
+     }.bindAsEventListener(this));
+    },
+    timer: null, //timer variable
+    popupTimer: function() {
+        this.timer = this.hidePopup.bind(this).delay(this.timerspeed);
+    },
+    popupTimerCancel: function() {
+        window.clearTimeout(this.timer);
+    },
     displayPopup: function() {
-        if (this.popuptimer) {
-        setTimeout(this.hidePopup.bind(this), this.popuptimerseconds);
-        }
+        this.popupTimer();
         $("cartpopup_overlay").hide();
         if (!this.mouseclose) {
             this.positionPopupStart();
