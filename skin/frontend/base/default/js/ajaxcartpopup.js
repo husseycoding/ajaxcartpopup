@@ -270,7 +270,7 @@ var cartpopup = Class.create({
             }
      }.bindAsEventListener(this));
     },
-    timer: null, //timer variable
+    timer: null,
     popupTimer: function() {
         this.timer = this.hidePopup.bind(this).delay(this.timerspeed);
     },
