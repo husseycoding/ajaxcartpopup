@@ -120,9 +120,9 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
 
     public function getItemShortDescription($item)
     {
-        $description = Mage::getModel('catalog/product')->load($item->getProductId());
-        $test = $description->getShortDescription();
-        return $test;
+        $product = Mage::getModel('catalog/product')->load($item->getProductId());
+        $description = $product->getShortDescription();
+        return $description ? $description : false;
     }
 
     public function showDescription()
@@ -135,9 +135,9 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
         return Mage::helper('ajaxcartpopup')->showPopupOnAdd();
     }
 
-    public function getTimerSpeed()
+    public function getAutoCloseTime()
     {
-        return Mage::helper('ajaxcartpopup')->getTimerSpeed();
+        return Mage::helper('ajaxcartpopup')->getAutoCloseTime();
     }
 
     public function getRelatedProducts($item)

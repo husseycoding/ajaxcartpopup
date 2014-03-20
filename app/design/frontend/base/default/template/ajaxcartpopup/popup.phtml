@@ -43,7 +43,8 @@
         thiscartpopup.deleteurls = [];
         thiscartpopup.updateurl = "<?php echo $this->getUrl('checkout/cart/updatePost'); ?>";
         thiscartpopup.showonadd = <?php echo $this->showPopupOnAdd() ? 'true' : 'false'; ?>;
-        thiscartpopup.timerspeed = <?php echo $this->getTimerSpeed(); ?>;
+        <?php $autoclosetime = $this->getAutoCloseTime(); ?>
+        thiscartpopup.autoclosetime = <?php echo $autoclosetime ? $autoclosetime : 'false'; ?>;
     //]]>
     </script>
 <?php endif; ?>
@@ -74,7 +75,7 @@
                             echo '<tr>';
                             echo '<td class="cartpopup_productimage"><a href="' . $this->getProductUrl($item->getProduct()) . '"><img src="' . Mage::helper('catalog/image')->init($item->getProduct(), 'thumbnail')->resize(60) . '" alt="' . $item->getName() . '" title="' . $item->getName() . '" /></a></td>';
                             echo '<td class="cartpopup_productname"><a href="' . $this->getProductUrl($item->getProduct()) . '">' . $item->getName() . '</a>';
-                            if ($this->showDescription()) echo '<p>' . $this->getItemShortDescription($item) . '</p>';
+                            if ($this->showDescription()) echo '<p class="short_description">' . $this->getItemShortDescription($item) . '</p>';
                             if ($messages = $this->getItemMessages($item)):
                                 foreach ($messages as $message):
                                     echo '<p class="item-msg ' . $message['type'] . '">' . $this->escapeHtml($message['text']) . '</p>';

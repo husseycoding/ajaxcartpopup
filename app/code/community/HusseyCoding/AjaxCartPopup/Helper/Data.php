@@ -251,10 +251,10 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
         return !$speed ? 0.3 : $speed;
     }
 
-    public function getTimerSpeed()
+    public function getAutoCloseTime()
     {
-        $timer = (float) Mage::getStoreConfig('ajaxcartpopup/popup/popup_timer');
-        return (is_float($timer) && $timer != 0) ? $timer : false;
+        $timer = (float) Mage::getStoreConfig('ajaxcartpopup/popup/popup_close_timer');
+        return !$timer ? false : $timer;
     }
     
     public function getConfigureProduct()

@@ -1,5 +1,6 @@
 var cartpopup = Class.create({
     afterInit: function() {
+        this.autoclose = false;
         $$('body')[0].insert($("cartpopup"));
         $("cartpopup").hide();
         this.cartelement = $$("a.top-link-cart")[0];
@@ -25,7 +26,7 @@ var cartpopup = Class.create({
         this.mouseclose = true;
         this.positionPopupStart();
         this.mouseDisplayPopup();
-        this.popupTimerEvent();
+        this.addCancelAutoCloseListener();
         this.addInputListener.bind(this).delay(this.slidespeed);
         this.popupshowing = false;
     },
@@ -263,22 +264,26 @@ var cartpopup = Class.create({
             return false;
         }
     },
-    popupTimerEvent: function() {
+    addCancelAutoCloseListener: function() {
         $("cartpopup").observe("mouseover", function(e) {
             if (Position.within($("cartpopup"), Event.pointerX(e), Event.pointerY(e))) {
-                this.popupTimerCancel();
+                this.cancelPopupAutoClose();
             }
-     }.bindAsEventListener(this));
+        }.bindAsEventListener(this));
     },
-    timer: null,
-    popupTimer: function() {
-        this.timer = this.hidePopup.bind(this).delay(this.timerspeed);
+    startPopupAutoClose: function() {
+        if (this.autoclosetime) {
+            this.autoclose = this.hidePopup.bind(this).delay(this.autoclosetime);
+        }
     },
-    popupTimerCancel: function() {
-        window.clearTimeout(this.timer);
+    cancelPopupAutoClose: function() {
+        if (this.autoclose) {
+            window.clearTimeout(this.autoclose);
+            this.autoclose = false;
+        }
     },
     displayPopup: function() {
-        this.popupTimer();
+        this.startPopupAutoClose();
         $("cartpopup_overlay").hide();
         if (!this.mouseclose) {
             this.positionPopupStart();
@@ -332,6 +337,7 @@ var cartpopup = Class.create({
     addCloseListener: function() {
         document.observe("click", function(e) {
             if (!e.target.up("div#cartpopup")) {
+                this.cancelPopupAutoClose();
                 this.hidePopup();
             }
         }.bindAsEventListener(this));
