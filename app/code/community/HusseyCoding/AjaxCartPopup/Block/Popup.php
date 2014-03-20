@@ -135,8 +135,8 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
         return Mage::helper('ajaxcartpopup')->showPopupOnAdd();
     }
 
-    public function getTimerSpeed()
+    public function getAutoCloseTime()
     {
-        return Mage::helper('ajaxcartpopup')->getTimerSpeed();
+        return Mage::helper('ajaxcartpopup')->getAutoCloseTime();
     }
 }

@@ -92,15 +92,15 @@
                             <show_in_store>1</show_in_store>
                             <comment>Popup will show instead of the normal notice.</comment>
                         </show_on_add>
-                        <popup_timer>
-                            <label>Auto Close Timer</label>
+                        <popup_close_timer>
+                            <label>Auto Close</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment>Optional, value in seconds</comment>
-                        </popup_timer>
+                        </popup_close_timer>
                         <short_description>
                             <label>Add Product Short Description</label>
                             <frontend_type>select</frontend_type>
