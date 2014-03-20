@@ -139,4 +139,25 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
     {
         return Mage::helper('ajaxcartpopup')->getTimerSpeed();
     }
+
+    public function getRelatedProducts($item)
+    {
+        $limit = Mage::helper('ajaxcartpopup')->getRelatedProductLimit();
+        static $y = 0;
+        $productsIds = $item->getRelatedProductIds();
+
+        for($i=0;$i<2;$i++):
+            if($y < $limit):
+                $relatedProducts[$i] =  Mage::getModel('catalog/product')->load($productsIds[$i]);
+                $y++;
+            endif;
+        endfor;
+        return isset($relatedProducts) ? $relatedProducts : false;
+    }
+
+    public function relatedProductEnabled()
+    {
+        return Mage::helper('ajaxcartpopup')->relatedProductEnabled();
+    }
+
 }

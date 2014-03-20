@@ -285,4 +285,26 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::getStoreConfig('ajaxcartpopup/popup/short_description') ? true : false;
     }
+
+    public function relatedProductEnabled()
+    {
+        return Mage::getStoreConfig('ajaxcartpopup/popup/related_product_enable') ? true : false;
+    }
+
+    public function getRelatedProductLimit()
+    {
+        $limit = (int) Mage::getStoreConfig('ajaxcartpopup/popup/related_product_limit');
+        return !$limit || $limit > 10 ? 10 : $limit;
+    }
+
+    public function getRelatedProducts($item)
+    {
+        $productsIds = $item->getRelatedProductIds();
+        for($i=0;$i<$this.getRelatedProductLimit();$i++):
+            $relatedProducts[$i] =  Mage::getModel('catalog/product')->load($productsIds[$i]);
+        endfor;
+
+        return isset($relatedProducts) ? $relatedProducts : false;
+    }
+
 }
