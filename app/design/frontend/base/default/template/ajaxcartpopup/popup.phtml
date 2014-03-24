@@ -61,14 +61,13 @@
         <form id="cartpopup_form" action="javascript:thiscartpopup.updateQuantityAction()" method="post">
             <table>
                 <thead>
-                    <th class="lefttext" colspan="2"><?php echo $this->__('Product'); ?></th>
-                    <th class="lefttext"><?php echo $this->__('Price'); ?></th>
-                    <th class="centertext"><?php echo $this->__('Quantity'); ?></th>
-                    <th class="centertext"><?php echo $this->__('Total'); ?></th>
+                <th class="lefttext" colspan="2"><?php echo $this->__('Product'); ?></th>
+                <th class="lefttext"><?php echo $this->__('Price'); ?></th>
+                <th class="centertext"><?php echo $this->__('Quantity'); ?></th>
+                <th class="centertext"><?php echo $this->__('Total'); ?></th>
                 </thead>
-                <tbody>                    
-                    <?php
-                        foreach ($this->getPopupItems($this->getProductLimit()) as $item):
+                    <tbody>
+                        <?php foreach ($this->getPopupItems($this->getProductLimit()) as $item):
                             echo '<script type="text/javascript">';
                             echo 'thiscartpopup.deleteurls[' . $item->getId() . '] = "' . $this->getDeleteUrl($item->getId()) . '";';
                             echo '</script>';
@@ -88,11 +87,30 @@
                             echo '<a class="cartpopup_remove" href="javascript:void(null)" onclick="thiscartpopup.removeFromCart(' . $item->getId() . ')">Remove</a>';
                             echo '</td>';
                             echo '<td class="righttext">' . $this->getItemRowPrice($item) . '</td>';
-                            echo '</tr>';
-                            $this->getRelatedProducts($item);
-                        endforeach;
-                    ?>
-                </tbody>
+                            echo '</tr>'; ?>
+                        <?php endforeach; ?>
+                    </tbody>
+                        <?php if ($this->relatedProductEnabled()) : ?>
+                            <thead>
+                            <th class="lefttext" colspan="2"><?php echo $this->__('Related Products'); ?></th>
+                            <th class="lefttext"><?php echo $this->__('Price'); ?></th>
+                            <th class="centertext"><?php echo $this->__(''); ?></th>
+                            <th class="centertext"><?php echo $this->__(''); ?></th>
+                            </thead>
+                                <tbody> <?php
+                                    foreach ($this->getPopupItems($this->getProductLimit()) as $item):
+                                        foreach ($this->getRelatedProducts($item->getProduct()) as $relatedItem):
+                                            echo '<tr>';
+                                            echo '<td class="cartpopup_productimage"><a href="' . $relatedItem->getProductUrl() . '" title="' . $this->escapeHtml($relatedItem->getName()) . '" ><img src="' . $this->helper('catalog/image')->init($relatedItem, 'thumbnail')->resize(50) . '" width="50" height="50" alt="' . $this->escapeHtml($relatedItem->getName()) . '" /></a></td>';
+                                            echo '<td class="cartpopup_productname"><a href="' . $relatedItem->getProductUrl() . '">' . $relatedItem->getName() . '</a></td>';
+                                            echo '<td class="lefttext">' . $this->getItemProductPrice($relatedItem). '</td>';
+                                            if ($this->helper('wishlist')->isAllow()) echo '<td><a href="' . $this->helper('wishlist')->getAddUrl($relatedItem) . '" class="link-wishlist">' . $this->__('Add to Wishlist') . '</a></br></td>';
+                                            echo '<td><a href="' . $this->helper('checkout/cart')->getAddUrl($relatedItem) . '" class="link-cart">' . $this->__('Add to Cart'). '</a><td/>';
+                                            echo '</tr>';
+                                        endforeach;
+                                    endforeach; ?>
+                                </tbody>
+                        <?php endif; ?>
             </table>
         </form>
         <div class="cartpopup_footer">

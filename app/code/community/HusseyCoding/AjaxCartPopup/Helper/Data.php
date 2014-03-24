@@ -297,14 +297,4 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
         return !$limit || $limit > 10 ? 10 : $limit;
     }
 
-    public function getRelatedProducts($item)
-    {
-        $productsIds = $item->getRelatedProductIds();
-        for($i=0;$i<$this.getRelatedProductLimit();$i++):
-            $relatedProducts[$i] =  Mage::getModel('catalog/product')->load($productsIds[$i]);
-        endfor;
-
-        return isset($relatedProducts) ? $relatedProducts : false;
-    }
-
 }
