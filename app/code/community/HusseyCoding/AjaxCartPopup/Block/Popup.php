@@ -142,21 +142,34 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
 
     public function relatedProductEnabled()
     {
-        return Mage::helper('ajaxcartpopup')->relatedProductEnabled();
+        $limit = Mage::helper('ajaxcartpopup')->getRelatedProductLimit();
+        return ($limit) ? true : false;
     }
 
     public function getRelatedProducts($item)
     {
         $limit = Mage::helper('ajaxcartpopup')->getRelatedProductLimit();
-        static $y = 0;
+
+        if($item->getTypeId() == "simple") :
         $productsIds = $item->getRelatedProductIds();
-        //possibly change a default of 2 for something like >> $limit divided by getCartItemCount()
-        for($i=0;$i<2;$i++):
-            if($y < $limit && array_key_exists($i ,$productsIds)):
+
+        elseif($item->getTypeId() == "configurable") :
+            $associatedProduct = $item->getTypeInstance()->getUsedProducts();
+
+        elseif($item->getTypeId() == "grouped") :
+
+        elseif($item->getTypeId() == "bundle") :
+
+        else :
+        return false;
+        endif;
+
+        for($i=0;$i<$limit;$i++):
+            if(isset($productsIds) && array_key_exists($i ,$productsIds)):
                 $relatedProducts[$i] =  Mage::getModel('catalog/product')->load($productsIds[$i]);
-                $y++;
             endif;
         endfor;
+
         return isset($relatedProducts) ? $relatedProducts : false;
     }
 

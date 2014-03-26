@@ -99,7 +99,9 @@
                             </thead>
                                 <tbody> <?php
                                     foreach ($this->getPopupItems($this->getProductLimit()) as $item):
-                                        foreach ($this->getRelatedProducts($item->getProduct()) as $relatedItem):
+                                        $test = $this->getRelatedProducts($item->getProduct());
+                                        if($test) :
+                                        foreach ($test as $relatedItem):
                                             echo '<tr>';
                                             echo '<td class="cartpopup_productimage"><a href="' . $relatedItem->getProductUrl() . '" title="' . $this->escapeHtml($relatedItem->getName()) . '" ><img src="' . $this->helper('catalog/image')->init($relatedItem, 'thumbnail')->resize(50) . '" width="50" height="50" alt="' . $this->escapeHtml($relatedItem->getName()) . '" /></a></td>';
                                             echo '<td class="cartpopup_productname"><a href="' . $relatedItem->getProductUrl() . '">' . $relatedItem->getName() . '</a></td>';
@@ -108,6 +110,7 @@
                                             echo '<td><a href="' . $this->helper('checkout/cart')->getAddUrl($relatedItem) . '" class="link-cart">' . $this->__('Add to Cart'). '</a><td/>';
                                             echo '</tr>';
                                         endforeach;
+                                        endif;
                                     endforeach; ?>
                                 </tbody>
                         <?php endif; ?>
