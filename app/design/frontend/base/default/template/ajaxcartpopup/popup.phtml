@@ -87,36 +87,25 @@
                             echo '<a class="cartpopup_remove" href="javascript:void(null)" onclick="thiscartpopup.removeFromCart(' . $item->getId() . ')">Remove</a>';
                             echo '</td>';
                             echo '<td class="righttext">' . $this->getItemRowPrice($item) . '</td>';
-                            echo '</tr>'; ?>
-                        <?php endforeach; ?>
-                    </tbody>
-                        <?php if ($this->relatedProductEnabled()) : ?>
-                            <thead>
-                            <th class="lefttext" colspan="2"><?php echo $this->__('Related Products'); ?></th>
-                            <th class="lefttext"><?php echo $this->__('Price'); ?></th>
-                            <th class="centertext"><?php echo $this->__(''); ?></th>
-                            <th class="centertext"><?php echo $this->__(''); ?></th>
-                            </thead>
-                                <tbody> <?php
-                                    foreach ($this->getPopupItems($this->getProductLimit()) as $item):
-                                        $test = $this->getRelatedProducts($item->getProduct());
-                                        if($test) :
-                                        foreach ($test as $relatedItem):
+                            echo '</tr>';
+                                if ($this->relatedProductEnabled()) :
+                                    $relatedProducts = $this->getRelatedProducts($item->getProduct());
+                                    if($relatedProducts) :
+                                        echo '<tr><td colspan="2" class="lefttext">Related Products</td></tr>';
+                                        foreach ($relatedProducts as $relatedProduct):
                                             echo '<tr>';
-                                            echo '<td class="cartpopup_productimage"><a href="' . $relatedItem->getProductUrl() . '" title="' . $this->escapeHtml($relatedItem->getName()) . '" ><img src="' . $this->helper('catalog/image')->init($relatedItem, 'thumbnail')->resize(50) . '" width="50" height="50" alt="' . $this->escapeHtml($relatedItem->getName()) . '" /></a></td>';
-                                            echo '<td class="cartpopup_productname"><a href="' . $relatedItem->getProductUrl() . '">' . $relatedItem->getName() . '</a></td>';
-                                            echo '<td class="lefttext">' . $this->getItemProductPrice($relatedItem). '</td>';
-                                            if ($this->helper('wishlist')->isAllow()) echo '<td><a href="' . $this->helper('wishlist')->getAddUrl($relatedItem) . '" class="link-wishlist">' . $this->__('Add to Wishlist') . '</a></br></td>';
-                                            echo '<td><a href="' . $this->helper('checkout/cart')->getAddUrl($relatedItem) . '" class="link-cart">' . $this->__('Add to Cart'). '</a><td/>';
+                                            echo '<td class="cartpopup_productimage"><a href="' . $relatedProduct->getProductUrl() . '" title="' . $this->escapeHtml($relatedProduct->getName()) . '" ><img src="' . $this->helper('catalog/image')->init($relatedProduct, 'thumbnail')->resize(30) . '" width="30" height="30" alt="' . $this->escapeHtml($relatedProduct->getName()) . '" /></a></td>';
+                                            echo '<td class="cartpopup_productname" ><a href="' . $relatedProduct->getProductUrl() . '">' . $relatedProduct->getName() . '</a></td>';
+                                            // echo '<td class="lefttext">' . $this->getItemProductPrice($relatedProduct). '</td>';
                                             echo '</tr>';
                                         endforeach;
-                                        endif;
-                                    endforeach; ?>
-                                </tbody>
-                        <?php endif; ?>
+                                    endif;
+                                endif;
+                        endforeach; ?>
+                    </tbody>
             </table>
         </form>
-        <div class="cartpopup_footer">
+      <div class="cartpopup_footer">
             <?php if ($extracount = $this->getExtraCount()): ?>
                 <div class="cartpopup_cartlink">
                     <a href="<?php echo Mage::helper('checkout/cart')->getCartUrl(); ?>"><?php echo $this->__('View all products'); ?></a>

@@ -143,7 +143,24 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
     public function relatedProductEnabled()
     {
         $limit = Mage::helper('ajaxcartpopup')->getRelatedProductLimit();
-        return ($limit) ? true : false;
+        return !$limit ? false : true;
+    }
+
+    public function returnRelatedProducts($associatedProducts)
+    {
+        $limit = Mage::helper('ajaxcartpopup')->getRelatedProductLimit();
+        foreach ($associatedProducts as $associatedProduct):
+            foreach ($associatedProduct->getRelatedProductIds() as $associatedProductId) :
+                $productsIds[] = $associatedProductId;
+            endforeach;
+        endforeach;
+        for($i=0;$i<$limit;$i++):
+            if(isset($productsIds) && array_key_exists($i ,$productsIds)):
+                $relatedProducts[$i] =  Mage::getModel('catalog/product')->load($productsIds[$i]);
+            endif;
+        endfor;
+
+        return isset($relatedProducts) ? $relatedProducts : false;
     }
 
     public function getRelatedProducts($item)
@@ -151,24 +168,28 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
         $limit = Mage::helper('ajaxcartpopup')->getRelatedProductLimit();
 
         if($item->getTypeId() == "simple") :
-        $productsIds = $item->getRelatedProductIds();
+            $productsIds = $item->getRelatedProductIds();
+                for($i=0;$i<$limit;$i++):
+                    if(isset($productsIds) && array_key_exists($i ,$productsIds)):
+                        $relatedProducts[$i] =  Mage::getModel('catalog/product')->load($productsIds[$i]);
+                     endif;
+                endfor;
 
         elseif($item->getTypeId() == "configurable") :
-            $associatedProduct = $item->getTypeInstance()->getUsedProducts();
+            $associatedProducts = $item->getTypeInstance()->getUsedProducts();
+            $relatedProducts = $this->returnRelatedProducts($associatedProducts);
 
         elseif($item->getTypeId() == "grouped") :
+            $associatedProducts = $item->getTypeInstance(true)->getAssociatedProducts($item);
+            $relatedProducts = $this->returnRelatedProducts($associatedProducts);
 
         elseif($item->getTypeId() == "bundle") :
+            $associatedProducts = $item->getTypeInstance(true)->getSelectionsCollection($item->getTypeInstance(true)->getOptionsIds($item), $item);
+            $relatedProducts = $this->returnRelatedProducts($associatedProducts);
 
         else :
         return false;
         endif;
-
-        for($i=0;$i<$limit;$i++):
-            if(isset($productsIds) && array_key_exists($i ,$productsIds)):
-                $relatedProducts[$i] =  Mage::getModel('catalog/product')->load($productsIds[$i]);
-            endif;
-        endfor;
 
         return isset($relatedProducts) ? $relatedProducts : false;
     }

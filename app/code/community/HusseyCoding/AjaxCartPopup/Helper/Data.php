@@ -290,7 +290,7 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $limit = (int) Mage::getStoreConfig('ajaxcartpopup/popup/related_product_limit');
         if($limit > 10) $limit = 10;
-        return !$limit ? false : $limit;
+        return $limit || $limit != 0 ? $limit : false;
     }
 
 }
