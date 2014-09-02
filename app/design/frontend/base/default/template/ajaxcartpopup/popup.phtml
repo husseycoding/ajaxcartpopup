@@ -72,9 +72,14 @@
                             echo 'thiscartpopup.deleteurls[' . $item->getId() . '] = "' . $this->getDeleteUrl($item->getId()) . '";';
                             echo '</script>';
                             echo '<tr>';
-                            echo '<td class="cartpopup_productimage"><a href="' . $this->getProductUrl($item->getProduct()) . '"><img src="' . Mage::helper('catalog/image')->init($item->getProduct(), 'thumbnail')->resize(60) . '" alt="' . $item->getName() . '" title="' . $item->getName() . '" /></a></td>';
-                            echo '<td class="cartpopup_productname"><a href="' . $this->getProductUrl($item->getProduct()) . '">' . $item->getName() . '</a>';
-                            if ($this->showDescription()) echo '<p class="short_description">' . $this->getItemShortDescription($item) . '</p>';
+                            echo '<td class="cartpopup_productimage">';
+                            echo '<a href="' . $this->getProductUrl($item->getProduct()) . '">';
+                            echo '<img src="' . Mage::helper('catalog/image')->init($item->getProduct(), 'thumbnail')->resize(60) . '" alt="' . $item->getName() . '" title="' . $item->getName() . '" />';
+                            echo '</a>';
+                            echo '</td>';
+                            echo '<td class="cartpopup_productname">';
+                            echo '<a href="' . $this->getProductUrl($item->getProduct()) . '">' . $item->getName() . '</a>';
+                            if ($description = $this->getShortDescription($item->getProduct())) echo '<p class="short_description">' . $description . '</p>';
                             if ($messages = $this->getItemMessages($item)):
                                 foreach ($messages as $message):
                                     echo '<p class="item-msg ' . $message['type'] . '">' . $this->escapeHtml($message['text']) . '</p>';
@@ -88,19 +93,21 @@
                             echo '</td>';
                             echo '<td class="righttext">' . $this->getItemRowPrice($item) . '</td>';
                             echo '</tr>';
-                                if ($this->relatedProductEnabled()) :
-                                    $relatedProducts = $this->getRelatedProducts($item->getProduct());
-                                    if($relatedProducts) :
-                                        echo '<tr><td colspan="2" class="lefttext">Related Products</td></tr>';
-                                        foreach ($relatedProducts as $relatedProduct):
-                                            echo '<tr>';
-                                            echo '<td class="cartpopup_productimage"><a href="' . $relatedProduct->getProductUrl() . '" title="' . $this->escapeHtml($relatedProduct->getName()) . '" ><img src="' . $this->helper('catalog/image')->init($relatedProduct, 'thumbnail')->resize(30) . '" width="30" height="30" alt="' . $this->escapeHtml($relatedProduct->getName()) . '" /></a></td>';
-                                            echo '<td class="cartpopup_productname" ><a href="' . $relatedProduct->getProductUrl() . '">' . $relatedProduct->getName() . '</a></td>';
-                                            // echo '<td class="lefttext">' . $this->getItemProductPrice($relatedProduct). '</td>';
-                                            echo '</tr>';
-                                        endforeach;
-                                    endif;
-                                endif;
+                            if ($relatedProducts = $this->getRelatedProducts($item->getProduct())):
+                                echo '<tr><td colspan="2" class="lefttext">Related Products</td></tr>';
+                                foreach ($relatedProducts as $relatedProduct):
+                                    echo '<tr>';
+                                    echo '<td class="cartpopup_productimage">';
+                                    echo '<a href="' . $relatedProduct->getProductUrl() . '" title="' . $this->escapeHtml($relatedProduct->getName()) . '" >';
+                                    echo '<img src="' . $this->helper('catalog/image')->init($relatedProduct, 'thumbnail')->resize(30) . '" alt="' . $this->escapeHtml($relatedProduct->getName()) . '" />';
+                                    echo '</a>';
+                                    echo '</td>';
+                                    echo '<td class="cartpopup_productname" >';
+                                    echo '<a href="' . $relatedProduct->getProductUrl() . '">' . $relatedProduct->getName() . '</a>';
+                                    echo '</td>';
+                                    echo '</tr>';
+                                endforeach;
+                            endif;
                         endforeach; ?>
                     </tbody>
             </table>

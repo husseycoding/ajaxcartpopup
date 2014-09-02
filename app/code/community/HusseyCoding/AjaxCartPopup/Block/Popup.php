@@ -118,16 +118,15 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
         return isset($messages) ? $message : false;
     }
 
-    public function getItemShortDescription($item)
+    public function getShortDescription($product)
     {
-        $product = Mage::getModel('catalog/product')->load($item->getProductId());
-        $description = $product->getShortDescription();
-        return $description ? $description : false;
-    }
-
-    public function showDescription()
-    {
-        return Mage::helper('ajaxcartpopup')->showDescription();
+        if (Mage::helper('ajaxcartpopup')->showDescription()):
+            if ($description = $product->getShortDescription()):
+                return $description;
+            endif;
+        endif;
+        
+        return false;
     }
     
     public function showPopupOnAdd()
@@ -140,58 +139,15 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
         return Mage::helper('ajaxcartpopup')->getAutoCloseTime();
     }
 
-    public function relatedProductEnabled()
+    public function getRelatedProducts($product)
     {
-        $limit = Mage::helper('ajaxcartpopup')->getRelatedProductLimit();
-        return !$limit ? false : true;
-    }
-
-    public function returnRelatedProducts($associatedProducts)
-    {
-        $limit = Mage::helper('ajaxcartpopup')->getRelatedProductLimit();
-        foreach ($associatedProducts as $associatedProduct):
-            foreach ($associatedProduct->getRelatedProductIds() as $associatedProductId) :
-                $productsIds[] = $associatedProductId;
-            endforeach;
-        endforeach;
-        for($i=0;$i<$limit;$i++):
-            if(isset($productsIds) && array_key_exists($i ,$productsIds)):
-                $relatedProducts[$i] =  Mage::getModel('catalog/product')->load($productsIds[$i]);
-            endif;
-        endfor;
-
-        return isset($relatedProducts) ? $relatedProducts : false;
-    }
-
-    public function getRelatedProducts($item)
-    {
-        $limit = Mage::helper('ajaxcartpopup')->getRelatedProductLimit();
-
-        if($item->getTypeId() == "simple") :
-            $productsIds = $item->getRelatedProductIds();
-                for($i=0;$i<$limit;$i++):
-                    if(isset($productsIds) && array_key_exists($i ,$productsIds)):
-                        $relatedProducts[$i] =  Mage::getModel('catalog/product')->load($productsIds[$i]);
-                     endif;
-                endfor;
-
-        elseif($item->getTypeId() == "configurable") :
-            $associatedProducts = $item->getTypeInstance()->getUsedProducts();
-            $relatedProducts = $this->returnRelatedProducts($associatedProducts);
-
-        elseif($item->getTypeId() == "grouped") :
-            $associatedProducts = $item->getTypeInstance(true)->getAssociatedProducts($item);
-            $relatedProducts = $this->returnRelatedProducts($associatedProducts);
-
-        elseif($item->getTypeId() == "bundle") :
-            $associatedProducts = $item->getTypeInstance(true)->getSelectionsCollection($item->getTypeInstance(true)->getOptionsIds($item), $item);
-            $relatedProducts = $this->returnRelatedProducts($associatedProducts);
-
-        else :
-        return false;
+        $relatedProducts = false;
+        if ($limit = Mage::helper('ajaxcartpopup')->getRelatedProductLimit()):
+            $relatedProducts = $product->getRelatedProductCollection();
+            $relatedProducts->getSelect()->limit($limit);
         endif;
 
-        return isset($relatedProducts) ? $relatedProducts : false;
+        return !empty($relatedProducts) && $relatedProducts->count() ? $relatedProducts : false;
     }
 
 }

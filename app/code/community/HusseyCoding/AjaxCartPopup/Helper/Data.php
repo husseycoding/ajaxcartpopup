@@ -13,8 +13,7 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
         $this->_customersession = Mage::getSingleton('customer/session');
         $this->_customercart = Mage::getSingleton('checkout/cart');
         
-        $sessioncount = $this->getCustomerSession()->getCartCount();
-        if (!isset($sessioncount)):
+        if ($sessioncount = $this->getCustomerSession()->getCartCount()):
             $cartcount = $this->getCartCount() ? $this->getCartCount() : 0;
             $this->getCustomerSession()->setCartCount($cartcount);
         else:
@@ -58,7 +57,7 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
     
     public function getCartCount()
     {
-        return $this->getCart()->getSummaryQty() ? $this->getCart()->getSummaryQty() : $this->getCart()->getSummaryCount();
+        return $this->getCart()->getSummaryQty();
     }
     
     public function showPopup()
@@ -78,8 +77,9 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
     
     public function getPopupItems($display = null, $items = null)
     {
-        if (!$items || !count($items)):
+        if (empty($items) || !count($items)):
             $this->getCustomerSession()->setPopupItems();
+        
             return array();
         endif;
         
@@ -88,8 +88,10 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
                 $this->_extracount = count($sorteditems) - $display;
                 $sorteditems = array_slice($sorteditems, 0, $display);
             endif;
+            
             return $sorteditems;
         endif;
+        
         return array();
     }
     
@@ -109,6 +111,7 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
                 $nextorder++;
             endforeach;
             $this->getCustomerSession()->setPopupItems($allitems);
+            
             return $items;
         else:
             $sessionitems = $this->getCustomerSession()->getPopupItems();
@@ -116,6 +119,7 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
                 foreach ($items as $item):
                     $allitems[$item->getProductId()] = $sessionitems[$item->getProductId()];
                 endforeach;
+                
                 return $this->_updateOrder($items, $allitems);
             elseif (count($sessionitems) < count($items)):
                 $nextorder = count($sessionitems);
@@ -145,6 +149,7 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
             foreach ($updateitems as $updateitem):
                 $sessionitems[$updateitem]['order'] = $sessionitems[$updateitem]['order'] - $nextorder;
             endforeach;
+            
             return $this->_updateOrder($items, $sessionitems);
         endif;
     }
@@ -289,8 +294,10 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
     public function getRelatedProductLimit()
     {
         $limit = (int) Mage::getStoreConfig('ajaxcartpopup/popup/related_product_limit');
-        if($limit > 10) $limit = 10;
-        return $limit || $limit != 0 ? $limit : false;
+        if ($limit > 10) $limit = 10;
+        if ($limit < 0) $limit = 0;
+        
+        return !empty($limit) ? $limit : 0;
     }
 
 }
