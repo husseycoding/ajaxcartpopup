@@ -10,18 +10,18 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Weee
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -628,6 +628,48 @@ class Mage_Weee_Helper_Data extends Mage_Core_Helper_Abstract
                 - $weeeTaxAppliedAmount['base_row_amount'], 0);
         }
         return $totalTaxForWeeeTax;
+    }
+
+    /**
+     * Calculate row weee amount for an order, invoice or credit memo item
+     * The returned value may contain discount if the discount is not included in
+     * the discount for subtotal
+     *
+     * @param mixed $item
+     * @return float
+     */
+    public function getRowWeeeAmountAfterDiscount($item)
+    {
+        $weeeTaxAppliedAmounts = $this->getApplied($item);
+        $weeeAmountInclDiscount = 0;
+        foreach ($weeeTaxAppliedAmounts as $weeeTaxAppliedAmount) {
+            $weeeAmountInclDiscount += $weeeTaxAppliedAmount['row_amount'];
+            if (!$this->includeInSubtotal()) {
+                $weeeAmountInclDiscount -= $weeeTaxAppliedAmount['weee_discount'];
+            }
+        }
+        return $weeeAmountInclDiscount;
+    }
+
+    /**
+     * Calculate base row weee amount for an order, invoice or credit memo item
+     * The returned value may contain discount if the discount is not included in
+     * the discount for subtotal
+     *
+     * @param mixed $item
+     * @return float
+     */
+    public function getBaseRowWeeeAmountAfterDiscount($item)
+    {
+        $weeeTaxAppliedAmounts = $this->getApplied($item);
+        $baseWeeeAmountInclDiscount = 0;
+        foreach ($weeeTaxAppliedAmounts as $weeeTaxAppliedAmount) {
+            $baseWeeeAmountInclDiscount += $weeeTaxAppliedAmount['base_row_amount'];
+            if (!$this->includeInSubtotal()) {
+                $baseWeeeAmountInclDiscount -= $weeeTaxAppliedAmount['base_weee_discount'];
+            }
+        }
+        return $baseWeeeAmountInclDiscount;
     }
 
     /**

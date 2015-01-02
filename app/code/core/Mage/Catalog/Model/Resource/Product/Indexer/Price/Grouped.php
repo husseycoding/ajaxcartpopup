@@ -10,18 +10,18 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Catalog
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -81,7 +81,7 @@ class Mage_Catalog_Model_Resource_Product_Indexer_Price_Grouped
 
         $select = $write->select()
             ->from(array('e' => $this->getTable('catalog/product')), 'entity_id')
-            ->joinLeft(
+            ->join(
                 array('l' => $this->getTable('catalog/product_link')),
                 'e.entity_id = l.product_id AND l.link_type_id=' . Mage_Catalog_Model_Product_Link::LINK_TYPE_GROUPED,
                 array())
@@ -94,11 +94,11 @@ class Mage_Catalog_Model_Resource_Product_Indexer_Price_Grouped
         $minCheckSql = $write->getCheckSql('le.required_options = 0', 'i.min_price', 0);
         $maxCheckSql = $write->getCheckSql('le.required_options = 0', 'i.max_price', 0);
         $select->columns('website_id', 'cw')
-            ->joinLeft(
+            ->join(
                 array('le' => $this->getTable('catalog/product')),
                 'le.entity_id = l.linked_product_id',
                 array())
-            ->joinLeft(
+            ->join(
                 array('i' => $table),
                 'i.entity_id = l.linked_product_id AND i.website_id = cw.website_id'
                     . ' AND i.customer_group_id = cg.customer_group_id',
@@ -114,6 +114,9 @@ class Mage_Catalog_Model_Resource_Product_Indexer_Price_Grouped
                 ))
             ->group(array('e.entity_id', 'cg.customer_group_id', 'cw.website_id'))
             ->where('e.type_id=?', $this->getTypeId());
+
+        $statusCond = $write->quoteInto(' = ?', Mage_Catalog_Model_Product_Status::STATUS_ENABLED);
+        $this->_addAttributeToSelect($select, 'status', 'e.entity_id', 'cs.store_id', $statusCond);
 
         if (!is_null($entityIds)) {
             $select->where('l.product_id IN(?)', $entityIds);

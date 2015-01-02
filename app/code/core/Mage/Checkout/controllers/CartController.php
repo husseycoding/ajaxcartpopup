@@ -10,18 +10,18 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Checkout
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -114,6 +114,23 @@ class Mage_Checkout_CartController extends Mage_Core_Controller_Front_Action
             }
         }
         return false;
+    }
+
+    /**
+     * Predispatch: remove isMultiShipping option from quote
+     *
+     * @return Mage_Checkout_CartController
+     */
+    public function preDispatch()
+    {
+        parent::preDispatch();
+
+        $cart = $this->_getCart();
+        if ($cart->getQuote()->getIsMultiShipping()) {
+            $cart->getQuote()->setIsMultiShipping(false);
+        }
+
+        return $this;
     }
 
     /**
@@ -576,5 +593,89 @@ class Mage_Checkout_CartController extends Mage_Core_Controller_Front_Action
         }
 
         $this->_goBack();
+    }
+
+    /**
+     * Minicart delete action
+     */
+    public function ajaxDeleteAction()
+    {
+        if (!$this->_validateFormKey()) {
+            Mage::throwException('Invalid form key');
+        }
+        $id = (int) $this->getRequest()->getParam('id');
+        $result = array();
+        if ($id) {
+            try {
+                $this->_getCart()->removeItem($id)->save();
+
+                $result['qty'] = $this->_getCart()->getSummaryQty();
+
+                $this->loadLayout();
+                $result['content'] = $this->getLayout()->getBlock('minicart_content')->toHtml();
+
+                $result['success'] = 1;
+                $result['message'] = $this->__('Item was removed successfully.');
+            } catch (Exception $e) {
+                $result['success'] = 0;
+                $result['error'] = $this->__('Can not remove the item.');
+            }
+        }
+
+        $this->getResponse()->setHeader('Content-type', 'application/json');
+        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($result));
+    }
+
+    /**
+     * Minicart ajax update qty action
+     */
+    public function ajaxUpdateAction()
+    {
+        if (!$this->_validateFormKey()) {
+            Mage::throwException('Invalid form key');
+        }
+        $id = (int)$this->getRequest()->getParam('id');
+        $qty = $this->getRequest()->getParam('qty');
+        $result = array();
+        if ($id) {
+            try {
+                $cart = $this->_getCart();
+                if (isset($qty)) {
+                    $filter = new Zend_Filter_LocalizedToNormalized(
+                        array('locale' => Mage::app()->getLocale()->getLocaleCode())
+                    );
+                    $qty = $filter->filter($qty);
+                }
+
+                $quoteItem = $cart->getQuote()->getItemById($id);
+                if (!$quoteItem) {
+                    Mage::throwException($this->__('Quote item is not found.'));
+                }
+                if ($qty == 0) {
+                    $cart->removeItem($id);
+                } else {
+                    $quoteItem->setQty($qty)->save();
+                }
+                $this->_getCart()->save();
+
+                $this->loadLayout();
+                $result['content'] = $this->getLayout()->getBlock('minicart_content')->toHtml();
+
+                $result['qty'] = $this->_getCart()->getSummaryQty();
+
+                if (!$quoteItem->getHasError()) {
+                    $result['message'] = $this->__('Item was updated successfully.');
+                } else {
+                    $result['notice'] = $quoteItem->getMessage();
+                }
+                $result['success'] = 1;
+            } catch (Exception $e) {
+                $result['success'] = 0;
+                $result['error'] = $this->__('Can not save item.');
+            }
+        }
+
+        $this->getResponse()->setHeader('Content-type', 'application/json');
+        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($result));
     }
 }
