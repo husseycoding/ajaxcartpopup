@@ -10,18 +10,18 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Paypal
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -132,9 +132,9 @@ class Mage_Paypal_Model_Hostedpro_Request extends Varien_Object
             'notify_url'    => $paymentMethod->getNotifyUrl(),
             'cancel_return' => $paymentMethod->getCancelUrl(),
             'return'        => $paymentMethod->getReturnUrl(),
-            'lc'            => $paymentMethod->getMerchantCountry(),
+            'lc'            => substr(Mage::app()->getLocale()->getLocaleCode(), -2), //gets language from locale code
 
-            'template'              => 'templateD',
+            'template'              => $paymentMethod->getTemplate(),
             'showBillingAddress'    => 'false',
             'showShippingAddress'   => 'true',
             'showBillingEmail'      => 'false',
@@ -156,17 +156,18 @@ class Mage_Paypal_Model_Hostedpro_Request extends Varien_Object
     protected function _getOrderData(Mage_Sales_Model_Order $order)
     {
         $request = array(
-            'subtotal'      => $this->_formatPrice(
-                $this->_formatPrice($order->getPayment()->getBaseAmountAuthorized()) -
-                $this->_formatPrice($order->getBaseTaxAmount()) -
-                $this->_formatPrice($order->getBaseShippingAmount())
-            ),
+            'subtotal'      => $this->_formatPrice($order->getBaseSubtotal()),
             'tax'           => $this->_formatPrice($order->getBaseTaxAmount()),
             'shipping'      => $this->_formatPrice($order->getBaseShippingAmount()),
             'invoice'       => $order->getIncrementId(),
             'address_override' => 'true',
             'currency_code'    => $order->getBaseCurrencyCode(),
-            'buyer_email'      => $order->getCustomerEmail()
+            'buyer_email'      => $order->getCustomerEmail(),
+            'discount'         => $this->_formatPrice(
+                $order->getBaseGiftCardsAmount()
+                + abs($order->getBaseDiscountAmount())
+                + $order->getBaseCustomerBalanceAmount()
+            ),
         );
 
         // append to request billing address data

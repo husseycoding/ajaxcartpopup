@@ -14,9 +14,9 @@
  *
  * @category   Zend
  * @package    Zend_Cache
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Manager.php 22727 2010-07-30 12:36:00Z mabe $
+ * @version    $Id$
  */
 
 /** @see Zend_Cache_Exception */
@@ -28,7 +28,7 @@
 /**
  * @category   Zend
  * @package    Zend_Cache
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class Zend_Cache_Manager
@@ -197,8 +197,9 @@ class Zend_Cache_Manager
      * be lazy loaded
      *
      * @param  string $name
-     * @param  array $options
+     * @param  array  $options
      * @return Zend_Cache_Manager
+     * @throws Zend_Cache_Exception
      */
     public function setCacheTemplate($name, $options)
     {
@@ -284,14 +285,23 @@ class Zend_Cache_Manager
             $current['backend']['name'] = $options['backend']['name'];
         }
         if (isset($options['frontend']['options'])) {
-            foreach ($options['frontend']['options'] as $key=>$value) {
+            foreach ($options['frontend']['options'] as $key => $value) {
                 $current['frontend']['options'][$key] = $value;
             }
         }
         if (isset($options['backend']['options'])) {
-            foreach ($options['backend']['options'] as $key=>$value) {
+            foreach ($options['backend']['options'] as $key => $value) {
                 $current['backend']['options'][$key] = $value;
             }
+        }
+        if (isset($options['frontend']['customFrontendNaming'])) {
+            $current['frontend']['customFrontendNaming'] = $options['frontend']['customFrontendNaming'];
+        }
+        if (isset($options['backend']['customBackendNaming'])) {
+            $current['backend']['customBackendNaming'] = $options['backend']['customBackendNaming'];
+        }
+        if (isset($options['frontendBackendAutoload'])) {
+            $current['frontendBackendAutoload'] = $options['frontendBackendAutoload'];
         }
         return $current;
     }

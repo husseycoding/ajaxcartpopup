@@ -15,16 +15,16 @@
  * @category   Zend
  * @package    Zend_Db
  * @subpackage Table
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Abstract.php 23380 2010-11-18 22:22:28Z ralph $
+ * @version    $Id$
  */
 
 /**
  * @category   Zend
  * @package    Zend_Db
  * @subpackage Table
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Countable, ArrayAccess
@@ -205,6 +205,7 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
                 $this->_connected = true;
             }
         }
+        $this->rewind();
         return $this->_connected;
     }
 
@@ -384,11 +385,11 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
             #require_once 'Zend/Db/Table/Rowset/Exception.php';
             throw new Zend_Db_Table_Rowset_Exception('No row could be found at position ' . (int) $position, 0, $e);
         }
-        
+
         if ($seek == true) {
             $this->seek($position);
         }
-        
+
         return $row;
     }
 
@@ -408,14 +409,14 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
         }
         return $this->_data;
     }
-    
+
     protected function _loadAndReturnRow($position)
     {
         if (!isset($this->_data[$position])) {
             #require_once 'Zend/Db/Table/Rowset/Exception.php';
             throw new Zend_Db_Table_Rowset_Exception("Data for provided position does not exist");
         }
-        
+
         // do we already have a row object for this position?
         if (empty($this->_rows[$position])) {
             $this->_rows[$position] = new $this->_rowClass(
@@ -426,6 +427,18 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
                     'readOnly' => $this->_readOnly
                 )
             );
+
+            if ( $this->_table instanceof Zend_Db_Table_Abstract ) {
+                $info = $this->_table->info();
+
+                if ( $this->_rows[$position] instanceof Zend_Db_Table_Row_Abstract ) {
+                    if ($info['cols'] == array_keys($this->_data[$position])) {
+                        $this->_rows[$position]->setTable($this->getTable());
+                    }
+                }
+            } else {
+                $this->_rows[$position]->setTable(null);
+            }
         }
 
         // return the row object

@@ -10,23 +10,23 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Catalog
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
  *
- * Speical Start Date attribute backend
+ * Start Date attribute backend
  *
  * @category   Mage
  * @package    Mage_Catalog
@@ -48,10 +48,6 @@ class Mage_Catalog_Model_Product_Attribute_Backend_Startdate extends Mage_Eav_Mo
         if ($startDate === false) {
             return false;
         }
-        if ($startDate == '' && $object->getSpecialPrice()) {
-            $startDate = Mage::app()->getLocale()->date();
-        }
-
         return $startDate;
     }
 
@@ -68,8 +64,6 @@ class Mage_Catalog_Model_Product_Attribute_Backend_Startdate extends Mage_Eav_Mo
         if ($startDate === false) {
             return $this;
         }
-
-        $object->setData($this->getAttribute()->getName(), $startDate);
         parent::beforeSave($object);
         return $this;
     }

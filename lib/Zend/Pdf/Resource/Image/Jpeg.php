@@ -14,9 +14,9 @@
  *
  * @category   Zend
  * @package    Zend_Pdf
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Jpeg.php 23395 2010-11-19 15:30:47Z alexander $
+ * @version    $Id$
  */
 
 
@@ -32,7 +32,7 @@
  * JPEG image
  *
  * @package    Zend_Pdf
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class Zend_Pdf_Resource_Image_Jpeg extends Zend_Pdf_Resource_Image
