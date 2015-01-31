@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<config>
-    <modules>
-        <HusseyCoding_EmailServer>
-            <active>true</active>
-            <codePool>local</codePool>
-        </HusseyCoding_EmailServer>
-    </modules>
-</config>
