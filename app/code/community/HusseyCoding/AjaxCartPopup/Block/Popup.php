@@ -1,127 +1,333 @@
 <?php
 class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Sidebar
 {
+    private $_currentcategory;
+    private $_currentproduct;
+    private $_carthelper;
+    private $_checkouthelper;
+    private $_urlhelper;
+    private $_customersession;
+    private $_thisrequest;
+    private $_currenturl;
+    private $_extracount = 0;
+    private $_taxconfig;
+    
+    public function _beforeToHtml()
+    {
+        if ($this->_getRequest()->getParam('ajaxcartpopup')):
+            $this->setTemplate('ajaxcartpopup/popupbody.phtml');
+        endif;
+    }
+    
+    public function isEnabled()
+    {
+        return Mage::getStoreConfig('ajaxcartpopup/general/enabled');
+    }
+    
+    private function _getCurrentCategory()
+    {
+        if (!isset($this->_currentcategory)):
+            $this->_currentcategory = false;
+            if ($category = Mage::registry('current_category')):
+                $this->_currentcategory = $category;
+            endif;
+        endif;
+        
+        return $this->_currentcategory;
+    }
+    
+    private function _getCurrentProduct()
+    {
+        if (!isset($this->_currentproduct)):
+            $this->_currentproduct = false;
+            if ($product = Mage::registry('current_product')):
+                $this->_currentproduct = $product;
+            endif;
+        endif;
+        
+        return $this->_currentproduct;
+    }
+    
+    public function isProductPage()
+    {
+        if ($this->_getCurrentProduct()):
+            return true;
+        endif;
+        
+        return false;
+    }
+    
+    public function getCategoryUrl()
+    {
+        if ($category = $this->_getCurrentCategory()):
+            return $category->getUrl();
+        endif;
+        
+        return '';
+    }
+    
+    public function getCategoryName()
+    {
+        if ($category = $this->_getCurrentCategory()):
+            $name = $category->getName();
+            return addslashes($name);
+        endif;
+        
+        return '';
+    }
+    
+    public function getProductImageUrl()
+    {
+        if ($product = $this->_getCurrentProduct()):
+            return $this->helper('catalog/image')->init($product, 'small_image')->resize(135);
+        endif;
+        
+        return '';
+    }
+    
+    public function getProductName()
+    {
+        if ($product = $this->_getCurrentProduct()):
+            $name = $product->getName();
+            return addslashes($name);
+        endif;
+        
+        return '';
+    }
+    
+    private function _getCartHelper()
+    {
+        if (!isset($this->_carthelper)):
+            $this->_carthelper = Mage::helper('checkout/cart');
+        endif;
+        
+        return $this->_carthelper;
+    }
+    
+    private function _getCheckoutHelper()
+    {
+        if (!isset($this->_checkouthelper)):
+            $this->_checkouthelper = Mage::helper('checkout');
+        endif;
+        
+        return $this->_checkouthelper;
+    }
+    
+    private function _getUrlHelper()
+    {
+        if (!isset($this->_urlhelper)):
+            $this->_urlhelper = Mage::helper('core/url');
+        endif;
+        
+        return $this->_urlhelper;
+    }
+    
+    private function _getCurrentUrl()
+    {
+        if (!isset($this->_currenturl)):
+            if ($this->_getRequest()->isXmlHttpRequest() && $this->_getRequest()->getServer('HTTP_REFERER')):
+                $this->_currenturl = $request->getServer('HTTP_REFERER');
+            else:
+                $this->_currenturl = $this->_getUrlHelper()->getCurrentUrl();
+            endif;
+
+        endif;
+        
+        return $this->_currenturl;
+    }
+    
     public function showPopup()
     {
-        return Mage::helper('ajaxcartpopup')->showPopup();
+        if ($count = $this->_getCartCount()):
+            if ($count != $this->_getCustomerSession()->getCartCount()):
+                $this->_updateCartCount();
+                if ($this->_showPopupOnAdd()):
+                    return 'true';
+                endif;
+            endif;
+        endif;
+        
+        return 'false';
     }
     
-    public function notEmpty()
+    private function _getCartCount()
     {
-        return Mage::helper('ajaxcartpopup')->notEmpty();
+        return $this->_getCartHelper()->getSummaryCount();
     }
     
-    public function getPopupItems($display = null)
+    private function _getCustomerSession()
     {
-        return Mage::helper('ajaxcartpopup')->getPopupItems($display, $this->getItems());
+        if (!isset($this->_customersession)):
+            $this->_customersession = Mage::getSingleton('customer/session');
+        endif;
+        
+        return $this->_customersession;
     }
     
-    public function getExtraCount()
+    public function showPopupOnAdd()
     {
-        return Mage::helper('ajaxcartpopup')->getExtraCount();
+        if ($this->_showPopupOnAdd()):
+            return 'true';
+        endif;
+        
+        return 'false';
     }
     
-    public function getDeleteUrl($itemid)
+    private function _showPopupOnAdd()
     {
-        return Mage::helper('ajaxcartpopup')->getDeleteUrl($itemid);
+        return Mage::getStoreConfig('ajaxcartpopup/popup/show_on_add');
     }
     
-    public function getProductUrl($product)
+    private function _updateCartCount()
     {
-        return Mage::helper('ajaxcartpopup')->getProductUrl($product);
+        $this->_getCustomerSession()->setCartCount($this->_getCartCount());
     }
     
-    public function getProductThumbnail($product)
+    private function _getRequest()
     {
-        return Mage::helper('ajaxcartpopup')->getProductThumbnail($product);
+        if (!isset($this->_thisrequest)):
+            $this->_thisrequest = Mage::app()->getRequest();
+        endif;
+        
+        return $this->_thisrequest;
+    }
+    
+    public function emptyCart()
+    {
+        if ($this->_getCartCount()):
+            return 'false';
+        endif;
+        
+        return 'true';
     }
     
     public function getCheckoutUrl()
     {
-        return Mage::helper('ajaxcartpopup')->getCheckoutUrl();
+        return $this->_getCheckoutUrl();
     }
     
-    public function ajaxEnabled()
+    private function _getCheckoutUrl()
     {
-        return Mage::helper('ajaxcartpopup')->ajaxEnabled();
+        if (Mage::getStoreConfig('checkout/options/onepage_checkout_enabled')):
+            return Mage::getUrl('checkout/onepage', array('_secure' => true));
+        endif;
+        
+        return Mage::getUrl('checkout/multishipping', array('_secure' => true));
     }
     
     public function displayCartButton()
     {
-        return Mage::helper('ajaxcartpopup')->displayCartButton();
+        return Mage::getStoreConfig('ajaxcartpopup/ajax/cart_button');
     }
     
     public function displayCheckoutButton()
     {
-        return Mage::helper('ajaxcartpopup')->displayCheckoutButton();
+        return Mage::getStoreConfig('ajaxcartpopup/ajax/checkout_button');
     }
     
-    public function getProductLimit()
+    public function getCartUrl()
     {
-        return Mage::helper('ajaxcartpopup')->getProductLimit();
+        return $this->_getCartUrl();
+    }
+    
+    private function _getCartUrl()
+    {
+        return $this->_getCartHelper()->getCartUrl();
+    }
+    
+    public function ajaxEnabled()
+    {
+        if (Mage::getStoreConfig('ajaxcartpopup/ajax/ajax_enabled')):
+            if (!$this->_isCartEditPage()):
+                return 'true';
+            endif;
+        endif;
+        
+        return 'false';
+    }
+    
+    private function _isCartEditPage()
+    {
+        $currenturl = $this->_getCurrentUrl();
+        $editpage = $this->_getCartUrl() . 'configure/';
+        
+        return strpos($currenturl, $editpage) === 0 ? true : false;
     }
     
     public function getSlideSpeed()
     {
-        return Mage::helper('ajaxcartpopup')->getSlideSpeed();
-    }
-
-    public function getConfigureProduct()
-    {
-        return Mage::helper('ajaxcartpopup')->getConfigureProduct();
+        $speed = (float) Mage::getStoreConfig('ajaxcartpopup/popup/slide_speed');
+        
+        return !empty($speed) ? $speed : 0.3;
     }
     
-    public function getItemProductPrice($item)
+    public function getUpdateUrl()
     {
-        if (Mage::getStoreConfig('ajaxcartpopup/popup/incl_tax')):
-            $price = $item->getPriceInclTax();
-        else:
-            $price = $item->getPrice();
+        return $this->getUrl('checkout/cart/updatePost');
+    }
+    
+    public function getAutoCloseTime()
+    {
+        $timer = (float) Mage::getStoreConfig('ajaxcartpopup/popup/popup_close_timer');
+        
+        return !empty($timer) ? $timer : 'false';
+    }
+    
+    private function _getProductLimit()
+    {
+        $limit = (int) Mage::getStoreConfig('ajaxcartpopup/popup/product_limit');
+        if ($limit <= 0):
+            $limit = 3;
+        elseif ($limit > 10):
+            $limit = 10;
         endif;
         
-        return Mage::helper('checkout')->formatPrice($price);
+        return $limit;
     }
     
-    public function getItemRowPrice($item)
+    public function getProductLimit()
     {
-        if (Mage::getStoreConfig('ajaxcartpopup/popup/incl_tax')):
-            $price = $item->getRowTotalInclTax();
-        else:
-            $price = $item->getRowTotal();
-        endif;
+        return $this->_getProductLimit();
+    }
+    
+    public function getDeleteUrl($itemid)
+    {
+        return Mage::getUrl('checkout/cart/delete', array('id' => $itemid, Mage_Core_Controller_Front_Action::PARAM_NAME_URL_ENCODED => $this->_getUrlHelper()->getEncodedUrl()));
+    }
+    
+    public function getPopupItems()
+    {
+        $items = $this->_getItems();
+        $limit = $this->getProductLimit();
+        $extra = count($items) - $limit;
+        $extra = $extra < 0 ? 0 : $extra;
+        $this->_extracount = $extra;
+        $items = array_slice($items, 0, $limit);
         
-        return Mage::helper('checkout')->formatPrice($price);
+        return $items;
     }
     
-    public function getCartSubtotal()
+    private function _getItems()
     {
-        if (Mage::getStoreConfig('ajaxcartpopup/popup/incl_tax')):
-            return Mage::helper('checkout')->formatPrice($this->getSubtotal(false));
-        else:
-            return Mage::helper('checkout')->formatPrice($this->getSubtotal(true));
-        endif;
-    }
-    
-    public function getItemMessages($item)
-    {
-        $item->checkData();
-        $baseMessages = $item->getMessage(false);
-        if ($baseMessages) {
-            foreach ($baseMessages as $message) {
-                $messages[] = array(
-                    'text' => $message,
-                    'type' => $item->getHasError() ? 'error' : 'notice'
-                );
-            }
-        }
+        $items = parent::getItems();
         
-        return isset($messages) ? $message : false;
+        return array_reverse($items);
     }
-
-    public function getShortDescription($product)
+    
+    public function getExtraCount()
     {
-        if (Mage::helper('ajaxcartpopup')->showDescription()):
-            if ($description = $product->getShortDescription()):
+        return $this->_extracount;
+    }
+    
+    public function getProductUrl($item)
+    {   
+        return $this->_getProductFromItem($item)->getProductUrl();
+    }
+    
+    public function getShortDescription($item)
+    {
+        if (Mage::getStoreConfig('ajaxcartpopup/popup/short_description')):
+            if ($description = $this->_getProductFromItem($item)->getShortDescription()):
                 return $description;
             endif;
         endif;
@@ -129,25 +335,107 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
         return false;
     }
     
-    public function showPopupOnAdd()
+    private function _getProductFromItem($item)
     {
-        return Mage::helper('ajaxcartpopup')->showPopupOnAdd();
+        $product = Mage::getModel('catalog/product')->load($item->getProduct()->getId());
+        
+        return $product;
+    }
+    
+    public function getItemMessages($item)
+    {
+        $item->checkData();
+        $itemmessages = $item->getMessage(false);
+        $messages = array();
+        if (!empty($itemmessages)) {
+            foreach ($itemmessages as $message) {
+                $message = $this->escapeHtml($message);
+                $messages[] = array(
+                    'text' => $message,
+                    'type' => $item->getHasError() ? 'error' : 'notice'
+                );
+            }
+        }
+        
+        return $messages;
+    }
+    
+    public function getItemProductPrice($item)
+    {
+        if ($this->_getTaxConfig()):
+            $price = $item->getPriceInclTax();
+        else:
+            $price = $item->getPrice();
+        endif;
+        
+        return $this->_formatPrice($price);
+    }
+    
+    public function getItemRowPrice($item)
+    {
+        if ($this->_getTaxConfig()):
+            $price = $item->getRowTotalInclTax();
+        else:
+            $price = $item->getRowTotal();
+        endif;
+        
+        return $this->_formatPrice($price);
+    }
+    
+    private function _formatPrice($price)
+    {
+        return $this->_getCheckoutHelper()->formatPrice($price);
     }
 
-    public function getAutoCloseTime()
+    public function getRelatedProducts($item)
     {
-        return Mage::helper('ajaxcartpopup')->getAutoCloseTime();
-    }
-
-    public function getRelatedProducts($product)
-    {
-        $relatedProducts = false;
-        if ($limit = Mage::helper('ajaxcartpopup')->getRelatedProductLimit()):
-            $relatedProducts = $product->getRelatedProductCollection();
-            $relatedProducts->getSelect()->limit($limit);
+        $limit = (int) Mage::getStoreConfig('ajaxcartpopup/popup/related_product_limit');
+        if ($limit < 0):
+            $limit = 0;
+        elseif ($limit > 10):
+            $limit = 10;
+        endif;
+        
+        if (!empty($limit)):
+            $related = $this->_getProductFromItem($item)->getRelatedProductCollection()
+                ->addAttributeToSelect('name')
+                ->addAttributeToSelect('thumbnail')
+                ->setPositionOrder()
+                ->addStoreFilter();
+            $related->getSelect()->limit($limit);
+            
+            if ($related->count()):
+                return $related;
+            endif;
         endif;
 
-        return !empty($relatedProducts) && $relatedProducts->count() ? $relatedProducts : false;
+        return false;
     }
-
+    
+    public function getCartSubtotal()
+    {
+        if ($this->_getTaxConfig()):
+            return $this->_formatPrice($this->getSubtotal(false));
+        else:
+            return $this->_formatPrice($this->getSubtotal(true));
+        endif;
+    }
+    
+    private function _getTaxConfig()
+    {
+        if (!isset($this->_taxconfig)):
+            $this->_taxconfig = Mage::getStoreConfig('ajaxcartpopup/popup/incl_tax');
+        endif;
+        
+        return $this->_taxconfig;
+    }
+    
+    public function getClickOpen()
+    {
+        if (Mage::getStoreConfig('ajaxcartpopup/popup/click_open')):
+            return 'true';
+        endif;
+        
+        return 'false';
+    }
 }

@@ -1,15 +1,14 @@
 var cartpopup = Class.create({
     afterInit: function() {
-        this.autoclose = false;
-        $$('body')[0].insert($("cartpopup"));
-        $("cartpopup").hide();
-        this.cartelement = $$("a.top-link-cart")[0];
         if (this.ajaxenabled) {
-            if (this.category) {
-                this.collectCategoryRequests();
-            } else if (this.product) {
+            if (this.product) {
                 this.observeSubmit();
+            } else {
+                this.collectCategoryRequests();
             }
+        }
+        if ($("header-cart")) {
+            $("header-cart").remove();
         }
         this.positionNoticeStart();
         if (this.showpopup) {
@@ -17,8 +16,16 @@ var cartpopup = Class.create({
             this.displayPopup();
             this.addCloseListener.bind(this).delay(this.slidespeed);
             this.addInputListener.bind(this).delay(this.slidespeed);
-        } else if (this.notempty) {
+        } else if (!this.emptycart) {
             this.initPopup();
+        }
+        this.disableCartLink();
+    },
+    getCartElement: function() {
+        if ($$("a.skip-cart")[0]) {
+            return $$("a.skip-cart")[0];
+        } else if ($$("a.top-link-cart")[0]) {
+            return $$("a.top-link-cart")[0];
         }
     },
     initPopup: function() {
@@ -31,11 +38,11 @@ var cartpopup = Class.create({
         this.popupshowing = false;
     },
     disablePopup: function() {
-        this.notempty = false;
+        this.emptycart = true;
         this.mouseclose = false;
-        document.stopObserving("click");
-        $("cartpopup").stopObserving("mouseout");
-        this.cartelement.stopObserving("mouseover");
+        document.stopObserving("click", this.documenthandler);
+        $("cartpopup").stopObserving("mouseout", this.hidehandler);
+        this.getCartElement().stopObserving(this.getOpenMethod(), this.popuphandler);
         if (this.popupshowing) {
             Effect.SlideUp("cartpopup", {duration: this.slidespeed});
             this.popupshowing = false;
@@ -67,8 +74,8 @@ var cartpopup = Class.create({
                     this.requests[id] = request;
                     e.writeAttribute("onclick", "");
 
-                    e.observe("click", function(ev) {
-                        var target = ev.target;
+                    e.observe("click", function(el) {
+                        var target = el.target;
                         if (target.tagName.toLowerCase() != "button") {
                             target = target.up("button.btn-cart");
                         }
@@ -79,7 +86,7 @@ var cartpopup = Class.create({
                             id = id.split("-").pop();
                             this.addToCart(id);
                         }
-                    }.bindAsEventListener(this, e));
+                    }.bind(this));
                 }
             }
         }.bind(this));
@@ -143,12 +150,12 @@ var cartpopup = Class.create({
                             notice += "<div class=\"ajaxnotice_buttons\">";
                             if (this.cartbutton) {
                                 notice += "<a href=\"" + this.carturl + "\">";
-                                notice += "<div class=\"ajaxnotice_cart\"><img src=\"" + this.cartbutton + "\" alt=\"\" \\></div>";
+                                notice += "<div class=\"ajaxnotice_cart\"><img src=\"" + this.cartbutton + "\" alt=\"\" \\><div>" + this.carttext + "</div></div>";
                                 notice += "</a>";
                             }
                             if (this.checkoutbutton) {
                                 notice += "<a href=\"" + this.checkouturl + "\">";
-                                notice += "<div class=\"ajaxnotice_checkout\"><img src=\"" + this.checkoutbutton + "\" alt=\"\" \\></div>";
+                                notice += "<div class=\"ajaxnotice_checkout\"><img src=\"" + this.checkoutbutton + "\" alt=\"\" \\><div>" + this.checkouttext + "</div></div>";
                                 notice += "</a>";
                             }
                             notice += "<div class=\"ajaxnotice_clearer\"></div>";
@@ -171,8 +178,8 @@ var cartpopup = Class.create({
                         if (itemid && deleteurl) {
                             this.deleteurls[itemid] = deleteurl;
                         }
-                        if (!this.notempty) {
-                            this.notempty = true;
+                        if (this.emptycart) {
+                            this.emptycart = false;
                             this.initPopup();
                         }
                     }
@@ -202,7 +209,7 @@ var cartpopup = Class.create({
                     var popuphtml = contentarray.popuphtml;
                     if (emptycart) {
                         this.disablePopup();
-                        this.updatePopup.bind(this).delay(this.slidespeed, linktext, popuphtml);
+                        this.updatePopup.bind(this).delay(this.slidespeed, linktext, popuphtml, true);
                     } else {
                         this.updatePopup(linktext, popuphtml);
                     }
@@ -234,7 +241,7 @@ var cartpopup = Class.create({
                     var popuphtml = contentarray.popuphtml;
                     if (emptycart) {
                         this.disablePopup();
-                        this.updatePopup.bind(this).delay(this.slidespeed, linktext, popuphtml);
+                        this.updatePopup.bind(this).delay(this.slidespeed, linktext, popuphtml, true);
                     } else {
                         this.updatePopup(linktext, popuphtml);
                     }
@@ -244,14 +251,19 @@ var cartpopup = Class.create({
             }.bind(this)
         });
     },
-    updatePopup: function(linktext, popuphtml) {
+    updatePopup: function(linktext, popuphtml, removecount) {
         if (linktext) {
-            var link = $$("a.top-link-cart")[0];
-            link.writeAttribute("title", linktext);
-            link.innerHTML = linktext;
+            var link = this.getCartElement();
+            if (link.readAttribute("title")) {
+                link.writeAttribute("title", linktext.stripScripts().stripTags());
+            }
+            link.update(linktext);
+            if (removecount) {
+                this.removeCount();
+            }
         }
         if (popuphtml) {
-            $("cartpopup_slidecontainer").innerHTML = popuphtml;
+            $("cartpopup_slidecontainer").update(popuphtml);
         }
         $("cartpopup_overlay").hide();
         this.addInputListener();
@@ -265,11 +277,13 @@ var cartpopup = Class.create({
         }
     },
     addCancelAutoCloseListener: function() {
-        $("cartpopup").observe("mouseover", function(e) {
-            if (Position.within($("cartpopup"), Event.pointerX(e), Event.pointerY(e))) {
-                this.cancelPopupAutoClose();
-            }
-        }.bindAsEventListener(this));
+        this.autoclosehandler =  this.autoCloseHandler.bind(this);
+        $("cartpopup").observe("mouseover", this.autoclosehandler);
+    },
+    autoCloseHandler: function(e) {
+        if (Position.within($("cartpopup"), Event.pointerX(e), Event.pointerY(e))) {
+            this.cancelPopupAutoClose();
+        }
     },
     startPopupAutoClose: function() {
         if (this.autoclosetime) {
@@ -289,7 +303,7 @@ var cartpopup = Class.create({
             this.positionPopupStart();
             Effect.SlideDown("cartpopup", {duration: this.slidespeed});
         } else {
-            this.cartelement.stopObserving("mouseover");
+            this.getCartElement().stopObserving(this.getOpenMethod(), this.popuphandler);
             Effect.SlideDown("cartpopup", {duration: this.slidespeed});
             this.mouseHidePopup.bind(this).delay(this.slidespeed);
             this.addCloseListener.bind(this).delay(this.slidespeed);
@@ -301,10 +315,10 @@ var cartpopup = Class.create({
         this.positionPopup();
     },
     positionPopup: function() {
-        var position = this.cartelement.viewportOffset();
+        var position = this.getCartElement().viewportOffset();
         var top = position.top;
         var left = position.left
-        var size = this.cartelement.getDimensions();
+        var size = this.getCartElement().getDimensions();
         var height = size.height;
         var width = size.width;
         var posleft = left + (width / 2) - ($("cartpopup").getWidth() / 2);
@@ -330,17 +344,19 @@ var cartpopup = Class.create({
     },
     positionNotice: function() {
         var viewportdimensions = document.viewport.getDimensions();
-        var noticedimensions = $('ajaxnotice').getDimensions();
-        $('ajaxnotice').style.left = (viewportdimensions.width / 2) - (noticedimensions.width / 2) + "px";
-        $('ajaxnotice').style.top = (viewportdimensions.height / 2) - (noticedimensions.height / 2) + "px";
+        var noticedimensions = $("ajaxnotice").getDimensions();
+        $("ajaxnotice").style.left = (viewportdimensions.width / 2) - (noticedimensions.width / 2) + "px";
+        $("ajaxnotice").style.top = (viewportdimensions.height / 2) - (noticedimensions.height / 2) + "px";
     },
     addCloseListener: function() {
-        document.observe("click", function(e) {
-            if (!e.target.up("div#cartpopup")) {
-                this.cancelPopupAutoClose();
-                this.hidePopup();
-            }
-        }.bindAsEventListener(this));
+        this.documenthandler =  this.documentHandler.bind(this);
+        document.observe("click", this.documenthandler);
+    },
+    documentHandler: function(e) {
+        if (!e.target.up("div#cartpopup")) {
+            this.cancelPopupAutoClose();
+            this.hidePopup();
+        }
     },
     addInputListener: function() {
         $$("#cartpopup_slidecontainer input").each(function(e) {
@@ -355,12 +371,12 @@ var cartpopup = Class.create({
     hidePopup: function() {
         if (!this.mouseclose) {
             this.mouseclose = true;
-            document.stopObserving("click");
+            document.stopObserving("click", this.documenthandler);
             Effect.SlideUp("cartpopup", {duration: this.slidespeed});
             this.mouseDisplayPopup.bind(this).delay(this.slidespeed);
         } else {
-            document.stopObserving("click");
-            $("cartpopup").stopObserving("mouseout");
+            document.stopObserving("click", this.documenthandler);
+            $("cartpopup").stopObserving("mouseout", this.hidehandler);
             Effect.SlideUp("cartpopup", {duration: this.slidespeed});
             this.mouseDisplayPopup.bind(this).delay(this.slidespeed);
         }
@@ -370,38 +386,45 @@ var cartpopup = Class.create({
         $("ajaxnotice").hide();
     },
     mouseDisplayPopup: function() {
-        this.cartelement.observe("mouseover", function(e) {
-            this.displayPopup();
-        }.bindAsEventListener(this));
+        this.popuphandler =  this.mousePopupHandler.bind(this);
+        this.getCartElement().observe(this.getOpenMethod(), this.popuphandler);
+    },
+    mousePopupHandler: function(e) {
+        this.displayPopup();
     },
     mouseHidePopup: function() {
-        $("cartpopup").observe("mouseout", function(e) {
-            if (!Position.within($("cartpopup"), Event.pointerX(e), Event.pointerY(e))) {
-                this.hidePopup();
-            }
-        }.bindAsEventListener(this));
+        this.hidehandler =  this.mouseHideHandler.bind(this);
+        $("cartpopup").observe("mouseout", this.hidehandler);
+    },
+    mouseHideHandler: function(e) {
+        if (!Position.within($("cartpopup"), Event.pointerX(e), Event.pointerY(e))) {
+            this.hidePopup();
+        }
     },
     positionAll: function() {
         this.positionNotice();
         this.positionPopup();
-    }
-});
-
-document.observe("dom:loaded", function() {
-    if (typeof(thiscartpopup) == "object") {
-        if (typeof(thisevolvedupdate) == "object") {
-            $("ajaxnotice").hide();
-            document.observe("evolved:loaded", function() {
-                thiscartpopup.afterInit();
-            });
-        } else {
-            thiscartpopup.afterInit();
+    },
+    getOpenMethod: function() {
+        if (this.clickopen) {
+            return "click";
         }
-    }
-});
-
-Event.observe(window, "resize", function() {
-    if (typeof(thiscartpopup) == "object") {
-        thiscartpopup.positionAll();
+        return "mouseover";
+    },
+    disableCartLink: function() {
+        if (this.clickopen) {
+            this.linkhandler =  this.cartLinkHandler.bind(this);
+            this.getCartElement().observe(this.getOpenMethod(), this.linkhandler);
+        }
+    },
+    cartLinkHandler: function(e) {
+        if (!this.emptycart) {
+            Event.stop(e);
+        }
+    },
+    removeCount: function(e) {
+        if (this.getCartElement().down("span.count")) {
+            this.getCartElement().down("span.count").remove();
+        }
     }
 });

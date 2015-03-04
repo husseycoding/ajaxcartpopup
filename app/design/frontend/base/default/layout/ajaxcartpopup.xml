@@ -1,9 +1,13 @@
 <?xml version="1.0"?>
 <layout version="0.1.0">
     <default>
+        <reference name="before_body_end">
+            <block type="ajaxcartpopup/popup" name="ajaxcartpopup" template="ajaxcartpopup/popup.phtml" after="-">
+                <block type="ajaxcartpopup/popup" name="ajaxcartpopupbody" template="ajaxcartpopup/popupbody.phtml" />
+            </block>
+            <block type="page/html" name="ajaxnotice" template="ajaxcartpopup/notice.phtml" before="ajaxcartpopup" />
+        </reference>
         <reference name="content">
-            <block type="ajaxcartpopup/popup" name="ajaxcartpopup" template="ajaxcartpopup/popup.phtml" after="-" />
-            <block type="page/html" name="ajaxnotice" template="ajaxcartpopup/notice.phtml" after="ajaxcartpopup" />
             <action method="unsetChild">
                 <name>cart_sidebar</name>
             </action>
@@ -28,5 +32,23 @@
                 <name>cart_sidebar</name>
             </action>
         </reference>
+        <reference name="minicart_head">
+            <action ifconfig="ajaxcartpopup/general/enabled" method="unsetChild">
+                <name>minicart_content</name>
+            </action>
+        </reference>
     </default>
+    <disable_ajaxcartpopup>
+        <remove name="ajaxcartpopup" />
+        <remove name="ajaxnotice" />
+    </disable_ajaxcartpopup>
+    <checkout_cart_index>
+        <update handle="disable_ajaxcartpopup" />
+    </checkout_cart_index>
+    <checkout_multishipping>
+        <update handle="disable_ajaxcartpopup" />
+    </checkout_multishipping>
+    <checkout_onepage_index>
+        <update handle="disable_ajaxcartpopup" />
+    </checkout_onepage_index>
 </layout>

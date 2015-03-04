@@ -4,21 +4,19 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
 {
     public function addAction()
     {
-        if (!Mage::getStoreConfig('ajaxcartpopup/ajax/ajax_enabled')) return parent::addAction();
-        if (!$this->getRequest()->getParam('ajaxcartpopup')):
-            $this->_goBack();
-            return;
+        if (!Mage::getStoreConfig('ajaxcartpopup/ajax/ajax_enabled')):
+            return parent::addAction();
         endif;
         
-        $itemcount = count(Mage::getSingleton('checkout/cart')->init()->getItems());
+        $items = Mage::getSingleton('checkout/cart')->init()->getItems();
+        $countbefore = count($items);
         
         parent::addAction();
         
         $this->getResponse()
             ->clearHeaders()
             ->clearBody();
-        $this->getResponse()
-            ->setHeader("Content-Type", "text/html; charset=UTF-8")
+        $this->getResponse()->setHeader("Content-Type", "text/html; charset=UTF-8")
             ->setHttpResponseCode(200)
             ->isRedirect(0);
         
@@ -32,16 +30,14 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
         $productname = '';
         $itemid = '';
         $deleteurl = '';
+        $product = $this->_initProduct();
         if ($result == 'success'):
             $this->loadLayout()->_initLayoutMessages('checkout/session');
             $message = Mage::app()->getLayout()->getMessagesBlock()->toHtml();
             $message = strip_tags($message);
-            $toplinks = $this->getLayout()->getBlock('top.links')->toHtml();
-            preg_match('/<a[^<]+top-link-cart.+<\/a>/Us', $toplinks, $linktext);
-            $linktext = strip_tags($linktext[0]);
+            $linktext = $this->_getLinkText();
             $popuphtml = $this->getLayout()->getBlock('ajaxcartpopup')->toHtml();
             if (Mage::app()->getRequest()->getParam('imagedetail')):
-                $product = $this->_initProduct();
                 $imageurl = (string) Mage::helper('catalog/image')->init($product, 'small_image')->resize(135);
                 $productname = addslashes($product->getName());
             endif;
@@ -50,20 +46,28 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
             $message = Mage::app()->getLayout()->getMessagesBlock()->toHtml();
             $message = strip_tags($message);
         else:
-            $result = Mage::helper('ajaxcartpopup')->getProductUrl($this->_initProduct());
+            $result = $product->getProductUrl();
         endif;
         
         Mage::helper('ajaxcartpopup')->updateCartCount();
         
-        if (Mage::helper('ajaxcartpopup')->getCartItemCount() > $itemcount):
-            $product = $this->_initProduct();
+        if (Mage::helper('ajaxcartpopup')->getCartItemCount() > $countbefore):
             $allitems = Mage::getSingleton('checkout/cart')->getItems()->getData();
             $itemid = array_pop($allitems);
             $itemid = $itemid['item_id'];
             $deleteurl = Mage::helper('ajaxcartpopup')->getDeleteUrl($itemid);
         endif;
         
-        $this->getResponse()->setBody(Zend_Json::encode(array('result' => $result, 'message' => $message, 'linktext' => $linktext, 'popuphtml' => $popuphtml, 'imageurl' => $imageurl, 'productname' => $productname, 'itemid' => $itemid, 'deleteurl' => $deleteurl)));
+        $this->getResponse()->setBody(Zend_Json::encode(array(
+            'result' => $result,
+            'message' => $message,
+            'linktext' => $linktext,
+            'popuphtml' => $popuphtml,
+            'imageurl' => $imageurl,
+            'productname' => $productname,
+            'itemid' => $itemid,
+            'deleteurl' => $deleteurl
+        )));
     }
     
     public function deleteAction()
@@ -92,14 +96,17 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
             $emptycart = '';
             if ($result == 'success'):
                 $this->loadLayout()->_initLayoutMessages('checkout/session');
-                $toplinks = $this->getLayout()->getBlock('top.links')->toHtml();
-                preg_match('/<a[^<]+top-link-cart.+<\/a>/Us', $toplinks, $linktext);
-                $linktext = strip_tags($linktext[0]);
+                $linktext = $this->_getLinkText();
                 $popuphtml = $this->getLayout()->getBlock('ajaxcartpopup')->toHtml();
                 $emptycart = Mage::helper('ajaxcartpopup')->getCartCount() ? false : true;
             endif;
 
-            $this->getResponse()->setBody(Zend_Json::encode(array('result' => $result, 'linktext' => $linktext, 'popuphtml' => $popuphtml, 'emptycart' => $emptycart)));
+            $this->getResponse()->setBody(Zend_Json::encode(array(
+                'result' => $result,
+                'linktext' => $linktext,
+                'popuphtml' => $popuphtml,
+                'emptycart' => $emptycart
+            )));
         endif;
     }
     
@@ -130,14 +137,30 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
             $emptycart = '';
             if ($result == 'success'):
                 $this->loadLayout()->_initLayoutMessages('checkout/session');
-                $toplinks = $this->getLayout()->getBlock('top.links')->toHtml();
-                preg_match('/<a[^<]+top-link-cart.+<\/a>/Us', $toplinks, $linktext);
-                $linktext = strip_tags($linktext[0]);
+                $linktext = $this->_getLinkText();
                 $popuphtml = $this->getLayout()->getBlock('ajaxcartpopup')->toHtml();
                 $emptycart = Mage::helper('ajaxcartpopup')->getCartCount() ? false : true;
             endif;
 
-            $this->getResponse()->setBody(Zend_Json::encode(array('result' => $result, 'linktext' => $linktext, 'popuphtml' => $popuphtml, 'emptycart' => $emptycart)));
+            $this->getResponse()->setBody(Zend_Json::encode(array(
+                'result' => $result,
+                'linktext' => $linktext,
+                'popuphtml' => $popuphtml,
+                'emptycart' => $emptycart
+            )));
         endif;
+    }
+    
+    private function _getLinkText()
+    {
+        if ($block = $this->getLayout()->getBlock('minicart_head')):
+            $cartlink = $block->toHtml();
+            preg_match('/<a.+skip-cart.+>(.+)<\/a>/Us', $cartlink, $linktext);
+        else:
+            $toplinks = $this->getLayout()->getBlock('top.links')->toHtml();
+            preg_match('/<a.+top-link-cart.+>(.+)<\/a>/Us', $toplinks, $linktext);
+        endif;
+        
+        return $linktext[1];
     }
 }

@@ -1,139 +1,47 @@
-<?php $update = $this->getRequest()->getParam('ajaxcartpopup'); ?>
-<?php $evolved = $this->getRequest()->getParam('evolvedupdate'); ?>
-<?php $exists = @class_exists('evolved') && evolved::getUseAjax(); ?>
-
-<?php if (!$update || ($update && $evolved)): ?>
+<?php if ($this->isEnabled()): ?>
     <script type="text/javascript">
-    //<![CDATA[
-        <?php if (($evolved && !$exists) || (!$evolved && $exists) || (!$evolved && !$exists)): ?>
+        //<![CDATA[
             var thiscartpopup = new cartpopup();
-        <?php endif; ?>
-        <?php if (Mage::registry('current_category') && !Mage::registry('current_product')): ?>
-            thiscartpopup.category = true;
-        <?php elseif (Mage::registry('current_category') && Mage::registry('current_product')): ?>
-            thiscartpopup.product = true;
-            thiscartpopup.backurl = "<?php echo Mage::registry('current_category')->getUrl(); ?>";
-            thiscartpopup.backname = "<?php echo addslashes(Mage::registry('current_category')->getName()); ?>";
-            thiscartpopup.imageurl = "<?php echo $this->helper('catalog/image')->init(Mage::registry('current_product'), 'small_image')->resize(135); ?>";
-            thiscartpopup.productname = "<?php echo addslashes(Mage::registry('current_product')->getName()); ?>";
-        <?php elseif (Mage::registry('current_product')): ?>
-            thiscartpopup.product = true;
-            thiscartpopup.backurl = "<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB); ?>";
-            thiscartpopup.backname = "Home";
-            thiscartpopup.imageurl = "<?php echo $this->helper('catalog/image')->init(Mage::registry('current_product'), 'small_image')->resize(135); ?>";
-            thiscartpopup.productname = "<?php echo addslashes(Mage::registry('current_product')->getName()); ?>";
-        <?php endif; ?>
-        thiscartpopup.showpopup = false;
-        thiscartpopup.notempty = false;
-        <?php if ($this->showPopup()): ?>
-            thiscartpopup.showpopup = true;
-        <?php elseif ($this->notEmpty()): ?>
-            thiscartpopup.notempty = true;
-        <?php endif; ?>
-        <?php if ($this->displayCartButton()): ?>
-            thiscartpopup.cartbutton = "<?php echo $this->getSkinUrl('images/ajaxcartpopup/button_cart.gif'); ?>";
-            thiscartpopup.carturl = "<?php echo Mage::helper('checkout/cart')->getCartUrl(); ?>";
-        <?php endif; ?>
-        <?php if ($this->displayCheckoutButton()): ?>
-            thiscartpopup.checkoutbutton = "<?php echo $this->getSkinUrl('images/ajaxcartpopup/button_checkout.gif'); ?>";
-            thiscartpopup.checkouturl = "<?php echo $this->getCheckoutUrl(); ?>";
-        <?php endif; ?>
-        thiscartpopup.ajaxenabled = <?php echo $this->ajaxEnabled() && !$this->getConfigureProduct() ? 'true' : 'false'; ?>;
-        thiscartpopup.slidespeed = <?php echo $this->getSlideSpeed(); ?>;
-        thiscartpopup.deleteurls = [];
-        thiscartpopup.updateurl = "<?php echo $this->getUrl('checkout/cart/updatePost'); ?>";
-        thiscartpopup.showonadd = <?php echo $this->showPopupOnAdd() ? 'true' : 'false'; ?>;
-        <?php $autoclosetime = $this->getAutoCloseTime(); ?>
-        thiscartpopup.autoclosetime = <?php echo $autoclosetime ? $autoclosetime : 'false'; ?>;
-    //]]>
-    </script>
-<?php endif; ?>
-    
-<?php if (!$update || ($update && $evolved)): ?>
-<div id="cartpopup" style="display:none">
-    <div id="cartpopup_slidecontainer">
-<?php endif; ?>
-        <div class="cartpopup_header">
-            <span><?php echo $this->__('Shopping Cart'); ?></span>
-            <a class="cartpopup_close" href="javascript:void(null)" onclick="thiscartpopup.hidePopup()">Close</a>
-            <div class="cartpopup_clear"></div>
-        </div>
-        <form id="cartpopup_form" action="javascript:thiscartpopup.updateQuantityAction()" method="post">
-            <table>
-                <thead>
-                <th class="lefttext" colspan="2"><?php echo $this->__('Product'); ?></th>
-                <th class="lefttext"><?php echo $this->__('Price'); ?></th>
-                <th class="centertext"><?php echo $this->__('Quantity'); ?></th>
-                <th class="centertext"><?php echo $this->__('Total'); ?></th>
-                </thead>
-                    <tbody>
-                        <?php foreach ($this->getPopupItems($this->getProductLimit()) as $item):
-                            echo '<script type="text/javascript">';
-                            echo 'thiscartpopup.deleteurls[' . $item->getId() . '] = "' . $this->getDeleteUrl($item->getId()) . '";';
-                            echo '</script>';
-                            echo '<tr>';
-                            echo '<td class="cartpopup_productimage">';
-                            echo '<a href="' . $this->getProductUrl($item->getProduct()) . '">';
-                            echo '<img src="' . Mage::helper('catalog/image')->init($item->getProduct(), 'thumbnail')->resize(60) . '" alt="' . $item->getName() . '" title="' . $item->getName() . '" />';
-                            echo '</a>';
-                            echo '</td>';
-                            echo '<td class="cartpopup_productname">';
-                            echo '<a href="' . $this->getProductUrl($item->getProduct()) . '">' . $item->getName() . '</a>';
-                            if ($description = $this->getShortDescription($item->getProduct())) echo '<p class="short_description">' . $description . '</p>';
-                            if ($messages = $this->getItemMessages($item)):
-                                foreach ($messages as $message):
-                                    echo '<p class="item-msg ' . $message['type'] . '">' . $this->escapeHtml($message['text']) . '</p>';
-                                endforeach;
-                            endif;
-                            echo '</td>';
-                            echo '<td class="lefttext">' . $this->getItemProductPrice($item) . '</td>';
-                            echo '<td>';
-                            echo '<input name="cart[' . $item->getId() . '][qty]" value="' . $item->getQty() . '" size="4" title="' . $this->__('Quantity') . '" class="input-text qty" maxlength="12" />';
-                            echo '<a class="cartpopup_remove" href="javascript:void(null)" onclick="thiscartpopup.removeFromCart(' . $item->getId() . ')">Remove</a>';
-                            echo '</td>';
-                            echo '<td class="righttext">' . $this->getItemRowPrice($item) . '</td>';
-                            echo '</tr>';
-                            if ($relatedProducts = $this->getRelatedProducts($item->getProduct())):
-                                echo '<tr><td colspan="2" class="lefttext">Related Products</td></tr>';
-                                foreach ($relatedProducts as $relatedProduct):
-                                    echo '<tr>';
-                                    echo '<td class="cartpopup_productimage">';
-                                    echo '<a href="' . $relatedProduct->getProductUrl() . '" title="' . $this->escapeHtml($relatedProduct->getName()) . '" >';
-                                    echo '<img src="' . $this->helper('catalog/image')->init($relatedProduct, 'thumbnail')->resize(30) . '" alt="' . $this->escapeHtml($relatedProduct->getName()) . '" />';
-                                    echo '</a>';
-                                    echo '</td>';
-                                    echo '<td class="cartpopup_productname" >';
-                                    echo '<a href="' . $relatedProduct->getProductUrl() . '">' . $relatedProduct->getName() . '</a>';
-                                    echo '</td>';
-                                    echo '</tr>';
-                                endforeach;
-                            endif;
-                        endforeach; ?>
-                    </tbody>
-            </table>
-        </form>
-      <div class="cartpopup_footer">
-            <?php if ($extracount = $this->getExtraCount()): ?>
-                <div class="cartpopup_cartlink">
-                    <a href="<?php echo Mage::helper('checkout/cart')->getCartUrl(); ?>"><?php echo $this->__('View all products'); ?></a>
-                </div>
+            <?php if ($this->isProductPage()): ?>
+                thiscartpopup.product = true;
+                thiscartpopup.backurl = "<?php echo $this->getCategoryUrl(); ?>";
+                thiscartpopup.backname = "<?php echo $this->getCategoryName(); ?>";
+                thiscartpopup.imageurl = "<?php echo $this->getProductImageUrl(); ?>";
+                thiscartpopup.productname = "<?php echo $this->getProductName(); ?>";
             <?php endif; ?>
-            <div class="cartpopup_subtotal">
-                <div class="cartpopup_producttotal">
-                    <?php echo $this->__('Total'); ?>: <?php echo $this->getCartSubtotal(); ?>
-                </div>
-                <a href="<?php echo $this->getCheckoutUrl(); ?>">
-                    <img src="<?php echo $this->getSkinUrl('images/ajaxcartpopup/button_checkout.gif'); ?>" alt="Checkout" />
-                </a>
-                <div class="cartpopup_clear"></div>
-            </div>
+            thiscartpopup.showpopup = <?php echo $this->showPopup(); ?>;
+            thiscartpopup.emptycart = <?php echo $this->emptyCart(); ?>;
+            <?php if ($this->displayCartButton()): ?>
+                thiscartpopup.cartbutton = "<?php echo $this->getSkinUrl('images/ajaxcartpopup/button.gif'); ?>";
+                thiscartpopup.carturl = "<?php echo $this->getCartUrl(); ?>";
+                thiscartpopup.carttext = "<?php echo $this->__('View Cart'); ?>";
+            <?php endif; ?>
+            <?php if ($this->displayCheckoutButton()): ?>
+                thiscartpopup.checkoutbutton = "<?php echo $this->getSkinUrl('images/ajaxcartpopup/button.gif'); ?>";
+                thiscartpopup.checkouturl = "<?php echo $this->getCheckoutUrl(); ?>";
+                thiscartpopup.checkouttext = "<?php echo $this->__('Checkout'); ?>";
+            <?php endif; ?>
+            thiscartpopup.ajaxenabled = <?php echo $this->ajaxEnabled(); ?>;
+            thiscartpopup.slidespeed = <?php echo $this->getSlideSpeed(); ?>;
+            thiscartpopup.deleteurls = [];
+            thiscartpopup.updateurl = "<?php echo $this->getUpdateUrl(); ?>";
+            thiscartpopup.showonadd = <?php echo $this->showPopupOnAdd(); ?>;
+            thiscartpopup.autoclose = false;
+            thiscartpopup.autoclosetime = <?php echo $this->getAutoCloseTime(); ?>;
+            thiscartpopup.clickopen = <?php echo $this->getClickOpen(); ?>;
+        //]]>
+    </script>
+    <div id="cartpopup" style="display:none">
+        <div id="cartpopup_slidecontainer">
+            <?php echo $this->getChildHtml('ajaxcartpopupbody'); ?>
         </div>
-        <div id="cartpopup_overlay">
-            <div class="cartpopup_overlay_center">
-                <img src="<?php echo $this->getSkinUrl('images/ajaxcartpopup/loading.gif'); ?>" alt="" />
-            </div>
-        </div>
-<?php if (!$update || ($update && $evolved)): ?>
     </div>
-</div>
+    <script type="text/javascript">
+        //<![CDATA[
+            thiscartpopup.afterInit();
+            Event.observe(window, "resize", function() {
+                thiscartpopup.positionAll();
+            });
+        //]]>
+    </script>
 <?php endif; ?>

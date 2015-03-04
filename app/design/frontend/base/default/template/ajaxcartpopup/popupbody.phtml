@@ -1,0 +1,95 @@
+<div class="cartpopup_header">
+    <span><?php echo $this->__('Shopping Cart'); ?></span>
+    <a class="cartpopup_close" href="javascript:void(null)" onclick="thiscartpopup.hidePopup()"><?php echo $this->__('Close'); ?></a>
+    <div class="cartpopup_clear"></div>
+</div>
+<form id="cartpopup_form" action="javascript:thiscartpopup.updateQuantityAction()" method="post">
+    <table>
+        <thead>
+            <th class="lefttext" colspan="2"><?php echo $this->__('Product'); ?></th>
+            <th class="lefttext"><?php echo $this->__('Price'); ?></th>
+            <th class="centertext"><?php echo $this->__('Quantity'); ?></th>
+            <th class="centertext"><?php echo $this->__('Total'); ?></th>
+        </thead>
+        <tbody>
+            <?php foreach ($this->getPopupItems() as $item): ?>
+                <script type="text/javascript">
+                    //<![CDATA[
+                        thiscartpopup.deleteurls[<?php echo $item->getId(); ?>] = "<?php echo $this->getDeleteUrl($item->getId()); ?>";
+                    //]]>
+                </script>
+                <?php $relatedproducts = $this->getRelatedProducts($item); ?>
+                <?php $borderclass = $relatedproducts ? ' noborder' : ''; ?>
+                <tr>
+                    <?php $url = $this->getProductUrl($item); ?>
+                    <td class="cartpopup_productimage<?php echo $borderclass; ?>">
+                        <a href="<?php echo $url; ?>">
+                            <img src="<?php echo Mage::helper('catalog/image')->init($item->getProduct(), 'thumbnail')->resize(60); ?>" alt="<?php echo $item->getName(); ?>" title="<?php echo $item->getName(); ?>" />
+                        </a>
+                    </td>
+                    <td class="cartpopup_productname<?php echo $borderclass; ?>">
+                        <a href="<?php echo $url; ?>"><?php echo $item->getName(); ?></a>
+                        <?php if ($description = $this->getShortDescription($item)): ?>
+                            <p class="short_description"><?php echo $description; ?></p>
+                        <?php endif; ?>
+                        <?php foreach ($this->getItemMessages($item) as $message): ?>
+                            <p class="item-msg <?php echo $message['type']; ?>"><?php echo $message['text']; ?></p>
+                        <?php endforeach; ?>
+                    </td>
+                    <td class="lefttext<?php echo $borderclass; ?>"><?php echo $this->getItemProductPrice($item); ?></td>
+                    <td<?php echo $borderclass ? ' class="' . $borderclass . '"' : ''; ?>>
+                        <input name="cart[<?php echo $item->getId(); ?>][qty]" value="<?php echo $item->getQty(); ?>" size="4" title="<?php echo $this->__('Quantity'); ?>" class="input-text qty" maxlength="12" />
+                        <a class="cartpopup_remove" href="javascript:void(null)" onclick="thiscartpopup.removeFromCart(<?php echo $item->getId(); ?>)"><?php echo $this->__('Remove'); ?></a>
+                    </td>
+                    <td class="righttext<?php echo $borderclass; ?>"><?php echo $this->getItemRowPrice($item); ?></td>
+                </tr>
+                <?php if ($relatedproducts): ?>
+                    <tr>
+                        <td colspan="5" class="nopaddingtop">
+                            <div class="lefttext"><?php echo $this->__('Related Products'); ?></div>
+                            <?php foreach ($relatedproducts as $relatedproduct): ?>
+                                <div class="cartpopup_related cartpopup_clear">
+                                    <div class="cartpopup_productimage">
+                                        <a href="<?php echo $relatedproduct->getProductUrl(); ?>" title="<?php echo $this->escapeHtml($relatedproduct->getName()); ?>">
+                                            <img src="<?php echo $this->helper('catalog/image')->init($relatedproduct, 'thumbnail')->resize(30); ?>" alt="<?php echo $this->escapeHtml($relatedproduct->getName()); ?>" />
+                                        </a>
+                                    </div>
+                                    <div class="cartpopup_productname">
+                                        <a href="<?php echo $relatedproduct->getProductUrl(); ?>"><?php echo $relatedproduct->getName(); ?></a>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+</form>
+<div class="cartpopup_footer">
+    <?php if ($extracount = $this->getExtraCount()): ?>
+        <div class="cartpopup_cartlink">
+            <a href="<?php echo $this->getCartUrl(); ?>"><?php echo $this->__('View all products'); ?></a>
+        </div>
+    <?php endif; ?>
+    <div class="cartpopup_subtotal">
+        <div class="cartpopup_producttotal">
+            <?php echo $this->__('Total'); ?>: <?php echo $this->getCartSubtotal(); ?>
+        </div>
+        <a href="<?php echo $this->getCartUrl(); ?>">
+            <img src="<?php echo $this->getSkinUrl('images/ajaxcartpopup/button.gif'); ?>" alt="<?php echo $this->__('View Cart'); ?>" />
+            <div><?php echo $this->__('View Cart'); ?></div>
+        </a>
+        <a href="<?php echo $this->getCheckoutUrl(); ?>">
+            <img src="<?php echo $this->getSkinUrl('images/ajaxcartpopup/button.gif'); ?>" alt="<?php echo $this->__('Checkout'); ?>" />
+            <div><?php echo $this->__('Checkout'); ?></div>
+        </a>
+        <div class="cartpopup_clear"></div>
+    </div>
+</div>
+<div id="cartpopup_overlay">
+    <div class="cartpopup_overlay_center">
+        <img src="<?php echo $this->getSkinUrl('images/ajaxcartpopup/loading.gif'); ?>" alt="" />
+    </div>
+</div>
