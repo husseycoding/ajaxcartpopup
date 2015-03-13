@@ -4,7 +4,7 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
 {
     public function addAction()
     {
-        if (!Mage::getStoreConfig('ajaxcartpopup/ajax/ajax_enabled')):
+        if (!Mage::getStoreConfig('ajaxcartpopup/general/enabled') || !Mage::getStoreConfig('ajaxcartpopup/ajax/ajax_enabled')):
             return parent::addAction();
         endif;
         

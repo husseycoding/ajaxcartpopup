@@ -126,7 +126,7 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
     {
         if (!isset($this->_currenturl)):
             if ($this->_getRequest()->isXmlHttpRequest() && $this->_getRequest()->getServer('HTTP_REFERER')):
-                $this->_currenturl = $request->getServer('HTTP_REFERER');
+                $this->_currenturl = $this->_getRequest()->getServer('HTTP_REFERER');
             else:
                 $this->_currenturl = $this->_getUrlHelper()->getCurrentUrl();
             endif;

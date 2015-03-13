@@ -1,7 +1,7 @@
 <?php if ($this->isEnabled()): ?>
     <script type="text/javascript">
         //<![CDATA[
-            var thiscartpopup = new cartpopup();
+            thiscartpopup = new cartpopup();
             <?php if ($this->isProductPage()): ?>
                 thiscartpopup.product = true;
                 thiscartpopup.backurl = "<?php echo $this->getCategoryUrl(); ?>";
