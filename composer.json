@@ -1,0 +1,16 @@
+{
+    "name":"husseycoding/ajaxcartpopup",
+    "type":"magento-module",
+    "license":"OSL-3.0",
+    "homepage":"https://github.com/husseycoding/ajaxcartpopup",
+    "description":"This extension gives you both ajax add/remove cart functionality and a rollover mini cart popup.",
+    "authors":[
+        {
+            "name":"Jonathan Hussey",
+            "email":"hussey@husseycoding.co.uk"
+        }
+    ],
+    "require":{
+        "magento-hackathon/magento-composer-installer":"*"
+    }
+}
