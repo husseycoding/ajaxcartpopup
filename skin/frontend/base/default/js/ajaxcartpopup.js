@@ -428,3 +428,93 @@ var cartpopup = Class.create({
         }
     }
 });
+
+var cartpage = Class.create({
+    afterInit: function() {
+        $$(".cart-table .btn-update")[0].remove();
+        $$(".cart-table .qty").each(function(e) {
+            e.observe("change", function(el) {
+                this.updateQuantity(el.target);
+            }.bind(this));
+            e.observe("keypress", function(el) {
+                if (el.keyCode == Event.KEY_RETURN) {
+                    Event.stop(el);
+                    this.updateQuantity(el.target);
+                }
+            }.bind(this));
+        }.bind(this));
+        $$(".cart-table .btn-remove").each(function(e) {
+            e.observe("click", function(el) {
+                Event.stop(el);
+                this.removeFromCart(el.target);
+            }.bind(this));
+        }.bind(this));
+    },
+    updateQuantity: function(e) {
+        this.showWorking();
+        var formdata = $$(".cart form")[0].serialize(true);
+        if (formdata) {
+            formdata.ajaxcartpopup = true;
+            formdata.ajaxupdatequantity = true;
+            formdata.update_cart_action = "update_qty";
+            formdata.iscartpage = true;
+            var parameters = formdata;
+        }
+        new Ajax.Request(this.updateurl, {
+            parameters: parameters,
+            onSuccess: function(response) {
+                var contentarray = response.responseText.evalJSON();
+                var result = contentarray.result;
+                if (result == "success") {
+                    if (e.value == "0") {
+                        this.removeAndStyle(e);
+                    }
+                    var totals = contentarray.totals;
+                    $("shopping-cart-totals-table").replace(totals);
+                    this.hideWorking();
+                }
+            }.bind(this)
+        });
+    },
+    removeFromCart: function(e) {
+        this.showWorking();
+        var parameters = { ajaxcartpopup:true, iscartpage:true };
+        new Ajax.Request(e.href, {
+            parameters: parameters,
+            onSuccess: function(response) {
+                var contentarray = response.responseText.evalJSON();
+                var result = contentarray.result;
+                if (result == "success") {
+                    this.removeAndStyle(e);
+                    var totals = contentarray.totals;
+                    $("shopping-cart-totals-table").replace(totals);
+                    this.hideWorking();
+                }
+            }.bind(this)
+        });
+    },
+    showWorking: function() {
+        $("ajaxnotice_result").hide();
+        this.positionNotice();
+        $("ajaxnotice_working").show();
+        $("ajaxnotice").show();
+    },
+    hideWorking: function() {
+        $("ajaxnotice_result").hide();
+        $("ajaxnotice").hide();
+        $("ajaxnotice_working").hide();
+    },
+    positionNotice: function() {
+        var viewportdimensions = document.viewport.getDimensions();
+        var noticedimensions = $("ajaxnotice").getDimensions();
+        $("ajaxnotice").style.left = (viewportdimensions.width / 2) - (noticedimensions.width / 2) + "px";
+        $("ajaxnotice").style.top = (viewportdimensions.height / 2) - (noticedimensions.height / 2) + "px";
+    },
+    removeAndStyle: function(e) {
+        e.up("tr").remove();
+        $$(".cart-table tbody tr").each(function(el) {
+            el.writeAttribute("class", "");
+        }.bind(this));
+        decorateTable("shopping-cart-table");
+    }
+});

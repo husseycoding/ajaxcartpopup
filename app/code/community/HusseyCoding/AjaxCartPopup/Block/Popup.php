@@ -98,7 +98,7 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
     private function _getCartHelper()
     {
         if (!isset($this->_carthelper)):
-            $this->_carthelper = Mage::helper('checkout/cart');
+            $this->_carthelper = $this->helper('checkout/cart');
         endif;
         
         return $this->_carthelper;
@@ -107,7 +107,7 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
     private function _getCheckoutHelper()
     {
         if (!isset($this->_checkouthelper)):
-            $this->_checkouthelper = Mage::helper('checkout');
+            $this->_checkouthelper = $this->helper('checkout');
         endif;
         
         return $this->_checkouthelper;
@@ -116,7 +116,7 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
     private function _getUrlHelper()
     {
         if (!isset($this->_urlhelper)):
-            $this->_urlhelper = Mage::helper('core/url');
+            $this->_urlhelper = $this->helper('core/url');
         endif;
         
         return $this->_urlhelper;
@@ -263,7 +263,7 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
     
     public function getUpdateUrl()
     {
-        return $this->getUrl('checkout/cart/updatePost');
+        return $this->helper('ajaxcartpopup')->getUpdateUrl();
     }
     
     public function getAutoCloseTime()

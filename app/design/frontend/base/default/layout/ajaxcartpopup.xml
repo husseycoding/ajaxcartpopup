@@ -5,7 +5,7 @@
             <block type="ajaxcartpopup/popup" name="ajaxcartpopup" template="ajaxcartpopup/popup.phtml" after="-">
                 <block type="ajaxcartpopup/popup" name="ajaxcartpopupbody" template="ajaxcartpopup/popupbody.phtml" />
             </block>
-            <block type="page/html" name="ajaxnotice" template="ajaxcartpopup/notice.phtml" before="ajaxcartpopup" />
+            <block type="core/template" name="ajaxnotice" template="ajaxcartpopup/notice.phtml" before="ajaxcartpopup" />
         </reference>
         <reference name="content">
             <action method="unsetChild">
@@ -39,11 +39,31 @@
         </reference>
     </default>
     <disable_ajaxcartpopup>
-        <remove name="ajaxcartpopup" />
-        <remove name="ajaxnotice" />
+        <reference name="before_body_end">
+            <action method="unsetChild">
+                <name>ajaxcartpopup</name>
+            </action>
+            <action method="unsetChild">
+                <name>ajaxnotice</name>
+            </action>
+        </reference>
     </disable_ajaxcartpopup>
     <checkout_cart_index>
         <update handle="disable_ajaxcartpopup" />
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>js/ajaxcartpopup.js</name>
+            </action>
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>css/ajaxcartpopup.css</name>
+            </action>
+        </reference>
+        <reference name="before_body_end">
+            <block type="ajaxcartpopup/cart" name="ajaxcartpage" template="ajaxcartpopup/cart.phtml" />
+            <block type="core/template" name="ajaxnotice" template="ajaxcartpopup/notice.phtml" />
+        </reference>
     </checkout_cart_index>
     <checkout_multishipping>
         <update handle="disable_ajaxcartpopup" />

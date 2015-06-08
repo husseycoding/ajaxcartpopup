@@ -22,4 +22,9 @@ class HusseyCoding_AjaxCartPopup_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::helper('checkout/cart')->getSummaryCount();
     }
+    
+    public function getUpdateUrl()
+    {
+        return Mage::getUrl('checkout/cart/updatePost');
+    }
 }

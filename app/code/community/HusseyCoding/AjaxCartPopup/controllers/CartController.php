@@ -90,23 +90,35 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
                 ->setHeader("Content-Type", "text/html; charset=UTF-8")
                 ->setHttpResponseCode(200)
                 ->isRedirect(0);
+            
+            if ($this->getRequest()->getParam('iscartpage')):
+                $totals = '';
+                if ($result == 'success'):
+                    $totals = $this->getLayout()->createBlock('checkout/cart_totals')->setTemplate('checkout/cart/totals.phtml')->toHtml();
+                endif;
 
-            $linktext = '';
-            $popuphtml = '';
-            $emptycart = '';
-            if ($result == 'success'):
-                $this->loadLayout()->_initLayoutMessages('checkout/session');
-                $linktext = $this->_getLinkText();
-                $popuphtml = $this->getLayout()->getBlock('ajaxcartpopup')->toHtml();
-                $emptycart = Mage::helper('ajaxcartpopup')->getCartCount() ? false : true;
+                $this->getResponse()->setBody(Zend_Json::encode(array(
+                    'result' => $result,
+                    'totals' => $totals
+                )));
+            else:
+                $linktext = '';
+                $popuphtml = '';
+                $emptycart = '';
+                if ($result == 'success'):
+                    $this->loadLayout()->_initLayoutMessages('checkout/session');
+                    $linktext = $this->_getLinkText();
+                    $popuphtml = $this->getLayout()->getBlock('ajaxcartpopup')->toHtml();
+                    $emptycart = Mage::helper('ajaxcartpopup')->getCartCount() ? false : true;
+                endif;
+
+                $this->getResponse()->setBody(Zend_Json::encode(array(
+                    'result' => $result,
+                    'linktext' => $linktext,
+                    'popuphtml' => $popuphtml,
+                    'emptycart' => $emptycart
+                )));
             endif;
-
-            $this->getResponse()->setBody(Zend_Json::encode(array(
-                'result' => $result,
-                'linktext' => $linktext,
-                'popuphtml' => $popuphtml,
-                'emptycart' => $emptycart
-            )));
         endif;
     }
     
@@ -131,23 +143,35 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
                 ->setHeader("Content-Type", "text/html; charset=UTF-8")
                 ->setHttpResponseCode(200)
                 ->isRedirect(0);
+            
+            if ($this->getRequest()->getParam('iscartpage')):
+                $totals = '';
+                if ($result == 'success'):
+                    $totals = $this->getLayout()->createBlock('checkout/cart_totals')->setTemplate('checkout/cart/totals.phtml')->toHtml();
+                endif;
 
-            $linktext = '';
-            $popuphtml = '';
-            $emptycart = '';
-            if ($result == 'success'):
-                $this->loadLayout()->_initLayoutMessages('checkout/session');
-                $linktext = $this->_getLinkText();
-                $popuphtml = $this->getLayout()->getBlock('ajaxcartpopup')->toHtml();
-                $emptycart = Mage::helper('ajaxcartpopup')->getCartCount() ? false : true;
+                $this->getResponse()->setBody(Zend_Json::encode(array(
+                    'result' => $result,
+                    'totals' => $totals
+                )));
+            else:
+                $linktext = '';
+                $popuphtml = '';
+                $emptycart = '';
+                if ($result == 'success'):
+                    $this->loadLayout()->_initLayoutMessages('checkout/session');
+                    $linktext = $this->_getLinkText();
+                    $popuphtml = $this->getLayout()->getBlock('ajaxcartpopup')->toHtml();
+                    $emptycart = Mage::helper('ajaxcartpopup')->getCartCount() ? false : true;
+                endif;
+
+                $this->getResponse()->setBody(Zend_Json::encode(array(
+                    'result' => $result,
+                    'linktext' => $linktext,
+                    'popuphtml' => $popuphtml,
+                    'emptycart' => $emptycart
+                )));
             endif;
-
-            $this->getResponse()->setBody(Zend_Json::encode(array(
-                'result' => $result,
-                'linktext' => $linktext,
-                'popuphtml' => $popuphtml,
-                'emptycart' => $emptycart
-            )));
         endif;
     }
     

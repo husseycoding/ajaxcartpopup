@@ -1,0 +1,10 @@
+<?php if ($this->isEnabled()): ?>
+    <script type="text/javascript">
+        //<![CDATA[
+            thiscartpage = new cartpage();
+            thiscartpage.updateurl = "<?php echo $this->getUpdateUrl(); ?>";
+
+            thiscartpage.afterInit();
+        //]]>
+    </script>
+<?php endif; ?>
