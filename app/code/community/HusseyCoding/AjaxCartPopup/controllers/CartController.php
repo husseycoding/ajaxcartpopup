@@ -74,7 +74,7 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
     {
         parent::deleteAction();
         
-        if ($this->getRequest()->getParam('ajaxcartpopup')):
+        if ($this->getRequest()->getParam('ajaxcartpopupreq')):
             $result = 'success';
             foreach (Mage::getSingleton('checkout/session')->getMessages()->getItems() as $message):
                 if ($message->getType() == 'error'):
@@ -126,7 +126,7 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
     {
         parent::updatePostAction();
         
-        if ($this->getRequest()->getParam('ajaxcartpopup') && $this->getRequest()->getParam('ajaxupdatequantity')):
+        if ($this->getRequest()->getParam('ajaxcartpopupreq') && $this->getRequest()->getParam('ajaxupdatequantity')):
             $result = 'success';
             $this->loadLayout()->_initLayoutMessages('checkout/session');
             foreach (Mage::getSingleton('checkout/session')->getMessages()->getItems() as $message):

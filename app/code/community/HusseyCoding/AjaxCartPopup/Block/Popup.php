@@ -14,7 +14,7 @@ class HusseyCoding_AjaxCartPopup_Block_Popup extends Mage_Checkout_Block_Cart_Si
     
     public function _beforeToHtml()
     {
-        if ($this->_getRequest()->getParam('ajaxcartpopup')):
+        if ($this->_getRequest()->getParam('ajaxcartpopupreq')):
             $this->setTemplate('ajaxcartpopup/popupbody.phtml');
         endif;
     }

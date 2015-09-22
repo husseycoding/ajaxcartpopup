@@ -101,7 +101,7 @@ var cartpopup = Class.create({
             formdata.isproductpage = true;
             var parameters = formdata;
         } else {
-            var parameters = {ajaxcartpopup : true, imagedetail : true};
+            var parameters = {ajaxcartpopupreq : true, imagedetail : true};
         }
         if (submiturl) {
             var url = submiturl;
@@ -197,7 +197,7 @@ var cartpopup = Class.create({
     removeFromCart: function(id) {
         $("cartpopup_overlay").show();
         var url = this.deleteurls[id];
-        var parameters = {ajaxcartpopup : true};
+        var parameters = {ajaxcartpopupreq : true};
         new Ajax.Request(url, {
             parameters: parameters,
             onSuccess: function(response) {
@@ -222,7 +222,7 @@ var cartpopup = Class.create({
     updateQuantity: function(formdata, updateurl) {
         $("cartpopup_overlay").show();
         if (formdata) {
-            formdata.ajaxcartpopup = true;
+            formdata.ajaxcartpopupreq = true;
             formdata.ajaxupdatequantity = true;
             formdata.update_cart_action = "update_qty";
             var parameters = formdata;
@@ -454,7 +454,7 @@ var cartpage = Class.create({
         this.showWorking();
         var formdata = $$(".cart form")[0].serialize(true);
         if (formdata) {
-            formdata.ajaxcartpopup = true;
+            formdata.ajaxcartpopupreq = true;
             formdata.ajaxupdatequantity = true;
             formdata.update_cart_action = "update_qty";
             formdata.iscartpage = true;
@@ -478,7 +478,7 @@ var cartpage = Class.create({
     },
     removeFromCart: function(e) {
         this.showWorking();
-        var parameters = { ajaxcartpopup:true, iscartpage:true };
+        var parameters = { ajaxcartpopupreq:true, iscartpage:true };
         new Ajax.Request(e.href, {
             parameters: parameters,
             onSuccess: function(response) {
