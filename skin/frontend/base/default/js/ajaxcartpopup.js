@@ -66,7 +66,7 @@ var cartpopup = Class.create({
         $$("button.btn-cart").each(function(e) {
             if (!e.up("div.block-reorder")) {
                 var request = e.readAttribute("onclick");
-                if (request.indexOf("/product/") > 0) {
+                if (request && request.indexOf("/product/") > 0) {
                     var id = request.substring(request.indexOf("/product/")).split("/");
                     id = id[2];
                     e.addClassName("ajaxprodid-" + id);
