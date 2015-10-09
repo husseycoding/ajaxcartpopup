@@ -97,7 +97,7 @@ var cartpopup = Class.create({
         this.positionNotice();
         $("ajaxnotice").show();
         if (formdata) {
-            formdata.ajaxcartpopup = true;
+            formdata.ajaxcartpopupreq = true;
             formdata.isproductpage = true;
             var parameters = formdata;
         } else {
@@ -191,6 +191,7 @@ var cartpopup = Class.create({
                         e.disabled = false;
                     });
                 }
+                this.getCartElement().down("span.count").setStyle({display :'inline-block'});
             }.bind(this)
         });
     },
@@ -424,7 +425,7 @@ var cartpopup = Class.create({
     },
     removeCount: function(e) {
         if (this.getCartElement().down("span.count")) {
-            this.getCartElement().down("span.count").remove();
+            this.getCartElement().down("span.count").hide();
         }
     }
 });
