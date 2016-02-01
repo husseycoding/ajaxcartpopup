@@ -198,7 +198,7 @@ var cartpopup = Class.create({
     removeFromCart: function(id) {
         $("cartpopup_overlay").show();
         var url = this.deleteurls[id];
-        var parameters = {ajaxcartpopupreq : true};
+        var parameters = {ajaxcartpopupreq : true, form_key : this.formkey};
         new Ajax.Request(url, {
             parameters: parameters,
             onSuccess: function(response) {

@@ -29,6 +29,7 @@
             thiscartpopup.autoclose = false;
             thiscartpopup.autoclosetime = <?php echo $this->getAutoCloseTime(); ?>;
             thiscartpopup.clickopen = <?php echo $this->getClickOpen(); ?>;
+            thiscartpopup.formkey = "<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>";
         //]]>
     </script>
     <div id="cartpopup" style="display:none">
