@@ -15,7 +15,7 @@
             <?php foreach ($this->getPopupItems() as $item): ?>
                 <script type="text/javascript">
                     //<![CDATA[
-                        thiscartpopup.deleteurls[<?php echo $item->getId(); ?>] = "<?php echo $this->getDeleteUrl($item->getId()); ?>";
+                        thiscartpopup.deleteurls[<?php echo $item->getId(); ?>] = "<?php echo $this->getDeleteUrl($item->getId()) . 'form_key/' . Mage::getSingleton('core/session')->getFormKey(); ?>";
                     //]]>
                 </script>
                 <?php $relatedproducts = $this->getRelatedProducts($item); ?>
