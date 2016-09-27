@@ -4,7 +4,7 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
 {
     public function addAction()
     {
-        if (!Mage::getStoreConfig('ajaxcartpopup/general/enabled') || !Mage::getStoreConfig('ajaxcartpopup/ajax/ajax_enabled')):
+        if (!Mage::getStoreConfig('ajaxcartpopup/general/enabled') || !Mage::getStoreConfig('ajaxcartpopup/ajax/ajax_enabled') || !$this->getRequest()->isXmlHttpRequest()):
             return parent::addAction();
         endif;
         
@@ -57,10 +57,6 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
             $itemid = $itemid['item_id'];
             $deleteurl = Mage::helper('ajaxcartpopup')->getDeleteUrl($itemid);
         endif;
-        
-        if (!$this->getRequest()->isXmlHttpRequest()) {
-            $this->_redirectReferer(Mage::helper('checkout/cart')->getCartUrl());
-        }
         
         $this->getResponse()->setBody(Zend_Json::encode(array(
             'result' => $result,
