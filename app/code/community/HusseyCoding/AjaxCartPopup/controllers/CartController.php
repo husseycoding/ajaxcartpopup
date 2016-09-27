@@ -58,6 +58,10 @@ class HusseyCoding_AjaxCartPopup_CartController extends Mage_Checkout_CartContro
             $deleteurl = Mage::helper('ajaxcartpopup')->getDeleteUrl($itemid);
         endif;
         
+        if (!$this->getRequest()->isXmlHttpRequest()) {
+            $this->_redirectReferer(Mage::helper('checkout/cart')->getCartUrl());
+        }
+        
         $this->getResponse()->setBody(Zend_Json::encode(array(
             'result' => $result,
             'message' => $message,
