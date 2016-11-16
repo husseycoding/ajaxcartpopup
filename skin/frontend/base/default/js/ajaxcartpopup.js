@@ -398,7 +398,7 @@ var cartpopup = Class.create({
         $("cartpopup").observe("mouseout", this.hidehandler);
     },
     mouseHideHandler: function(e) {
-        if (!Position.within($("cartpopup"), Event.pointerX(e), Event.pointerY(e))) {
+        if (!Position.within($("cartpopup"), Event.pointerX(e), Event.pointerY(e) - document.viewport.getScrollOffsets()['top'])) {
             this.hidePopup();
         }
     },
